@@ -1,0 +1,18 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Articles de {{ user.username }}{% endblock %}
+
+{% block main %}
+
+  <h2>Articles de {{ user.username }}</h2>
+
+  <div class="content">
+  
+    <ul>
+      {% for product in products %}
+        <li>{{ product.name }}</li>
+      {% endfor %}
+    </ul>
+  
+  </div>
+{% endblock %}

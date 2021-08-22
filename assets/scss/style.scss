@@ -1,0 +1,10 @@
+@import "utils";
+@import "config";
+
+h1, h2, h3, h4 {
+  text-align: center;
+}
+
+@import "header";
+@import "main";
+@import "footer";

@@ -1,0 +1,15 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Catégorie {{ category.name | capitalize }}{% endblock %}
+
+{% block main %}
+  <h2>{{ category.name | capitalize }}</h2>
+
+  <div class="content">
+    <ul>
+      {% for product in products %}
+        <li>{{ product.name }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endblock %}

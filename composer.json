@@ -1,0 +1,22 @@
+{
+    "name": "administrateur/pipot",
+    "type": "project",
+    "require": {
+        "phpmailer/phpmailer": "^6.5",
+        "twig/twig": "^3.3"
+    },
+    "require-dev": {
+        "vlucas/phpdotenv": "^5.3"
+    },
+    "authors": [
+        {
+            "name": "Melvin DOUCET",
+            "email": "melv.douc@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "app\\": "./"
+        }
+    }
+}

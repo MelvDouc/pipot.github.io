@@ -1,0 +1,38 @@
+header {
+  .top h1 {
+    @extend %gridCenter;
+    background: black;
+    color: white;
+    font-size: 2.5em;
+    padding: .25em;
+  }
+
+  .bottom {
+    ul {
+      display: flex;
+      list-style: none;
+
+      li {
+        width: 100%;
+
+        a {
+          @extend %gridCenter;
+          text-align: center;
+          background: $silver1;
+          background: $silver-gradient1;
+          color: inherit;
+          font-size: 1.1em;
+          text-decoration: none;
+          padding: .25em;
+          height: 100%;
+
+          &:hover {
+            background: $green-gradient1;
+            font-weight: bold;
+            color: white;
+          }
+        }
+      }
+    }
+  }
+}

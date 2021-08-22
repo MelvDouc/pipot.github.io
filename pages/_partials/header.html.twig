@@ -1,0 +1,24 @@
+<header>
+  <div class="top">
+    <h1>PIPOT</h1>
+  </div>
+  <nav class="bottom">
+    <ul>
+      <li>
+        <a href="/accueil">Accueil</a>
+      </li>
+      <li>
+        <a href="/categories">Catégories</a>
+      </li>
+      {% if is_user_logged_in %}
+        <li>
+          <a href="/mon-profil">Mon profil</a>
+        </li>
+      {% else %}
+        <li>
+          <a href="/connexion">Connexion / Inscription</a>
+        </li>
+      {% endif %}
+    </ul>
+  </nav>
+</header>

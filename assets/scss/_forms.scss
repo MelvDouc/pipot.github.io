@@ -1,0 +1,48 @@
+form {
+  display: flex;
+
+  .form-submit {
+    @extend %gridCenter;
+  }
+}
+
+.login-form {
+  flex-direction: column;
+  max-width: 800px;
+  margin: 0 auto 1em auto;
+  background: $green3;
+  background: $green-gradient2;
+  color: white;
+  padding: .75em;
+  border-radius: 5px;
+
+  .button {
+    // background: $blue1;
+    // background: $blue-gradient1;
+    background: hsl(222, 87%, 51%);
+  }
+}
+
+.logout-form {
+  justify-content: flex-end;
+
+  .button {
+    background: red;
+    color: white;
+    transition: box-shadow .2s;
+
+    &:hover {
+      box-shadow: 2px 2px 4px 2px hsl(0, 1%, 66%);
+    }
+  }
+}
+
+form-group,
+.form-submit {
+  padding: .5em;
+}
+
+form-group {
+  display: flex;
+  flex-direction: column;
+}

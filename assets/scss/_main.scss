@@ -1,0 +1,17 @@
+main {
+  min-height: calc(100vh - var(--header-height));
+  
+  h2 {
+    font-size: 1.85rem;
+    background: $blue1;
+    background: $blue-gradient1;
+    color: white;
+    padding: .35em;
+  }
+
+  .content {
+    padding: 1em;
+  }
+}
+
+@import "forms";

@@ -1,0 +1,16 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block main %}
+  {% if flash_message is defined %}
+    <div class="flash-message">{{ flash_message }}</div>
+  {% endif %}
+
+  <div class="content">
+  <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorum maxime sapiente, facilis voluptatem laboriosam quas facere eaque deleniti quam aliquam nesciunt ad rerum in consequatur laudantium hic magnam distinctio error.</p>
+  <p>Atque facere, molestiae delectus corrupti debitis quis fugiat! Consequuntur molestiae eveniet repellat, nihil eos similique, dolores ducimus nemo facere explicabo placeat veritatis adipisci cupiditate nostrum quis quisquam deleniti hic fugiat.</p>
+  <p>Laboriosam inventore fuga eveniet quo ab necessitatibus magnam eum minima! Sed odio ut quis, beatae rerum non rem natus hic excepturi cumque doloribus, autem, consequatur eum dolorem ea delectus iure.</p>
+  
+  </div>
+{% endblock %}

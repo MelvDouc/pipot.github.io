@@ -1,0 +1,33 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Connexion{% endblock %}
+
+
+{% block main %}
+  <h2>Connexion</h2>
+
+  <div class="content">
+    <form action="/connexion" method="POST" class="login-form">
+      {% for group in formGroups %}
+        <form-group
+          label-text="{{ group.labelText }}"
+          for-name-id="{{ group.forNameId }}"
+          input-type="{{ group.inputType }}"
+          is-required="{{ group.isRequired }}"
+        >
+        </form-group>
+      {% endfor %}
+      <div class="form-submit">
+        <button class="button" type="submit">Se connecter</button>
+      </div>
+    </form>
+
+    <p>Pas encore de compte ? <a href="/inscription">S'inscrire</a></p>
+
+    {% if error is defined %}
+      <div class="login-error">
+        {{ error }}
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}
