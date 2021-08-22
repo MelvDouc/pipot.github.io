@@ -2,18 +2,18 @@
 
 namespace app\controllers;
 
-use app\core\Application;
-use app\core\Controller;
 use app\core\Request;
+use app\core\Controller;
+use app\core\Application;
 use app\models\FormGroup;
-use app\models\User;
+use app\models\Login;
 
 class AuthController extends Controller
 {
   public function login(Request $request)
   {
     if (Application::$instance->session->hasUser())
-      return $this->render("home", [
+      return $this->redirect("accueil", "home", [
         "flash_message" => "Vous êtes déjà connecté."
       ]);
 
@@ -23,37 +23,19 @@ class AuthController extends Controller
     ];
 
     if ($request->isPost()) {
-      extract($_POST);
-      $error = null;
+      $login = new Login($_POST);
+      $validation = $login->validate();
 
-      if (!$uuid || !$password)
-        $error = "Veuillez remplir tous les champs.";
-      else {
-        $user = Application::$instance->database->findOne(
-          User::DB_TABLE,
-          [
-            "username" => $uuid,
-            "email" => $uuid,
-          ],
-          "OR"
-        );
-        if (!$user)
-          $error = "Utilisateur non trouvé.";
-        else if (!Application::$instance->database->isCorrectPassword($uuid, $password))
-          $error = "Mot de passe incorrect.";
-        else if ($user["is_account_active"] == 0)
-          $error = "Vous n'avez pas encore activé votre compte.";
-      }
-
-      if ($error)
+      if ($validation !== 1)
         return $this->render("authentication/login", [
           "formGroups" => $formGroups,
-          "error" => $error
+          "error" => $validation
         ]);
 
-      Application::$instance->session->setUser($user);
-      header("Location: mon-profil");
-      return $this->render("user/my-profile", ["user" => $user]);
+      $login->setLoggedUser();
+      return $this->redirect("mon-profil", "user/my-profile", [
+        "user" => $login->getUser()
+      ]);
     }
 
     return $this->render("authentication/login", [
@@ -64,57 +46,6 @@ class AuthController extends Controller
   public function logout()
   {
     Application::$instance->session->removeUser();
-    header("Location: /");
-  }
-
-  public function my_profile()
-  {
-    if (!Application::$instance->session->hasUser())
-      return $this->render("authentication/login", ["error" => "Vous n'êtes pas connecté."]);
-
-    $user = Application::$instance->session->getUser();
-
-    return $this->render("user/my-profile", [
-      "user" => $user
-    ]);
-  }
-
-  public function profile()
-  {
-    $id = $this->getParamId();
-    if (!$id)
-      return $this->render("404");
-
-    $user = Application::$instance->database->findOne(User::DB_TABLE, ["id" => $id]);
-    if (!$user)
-      return $this->render("404");
-
-    return $this->render("user/profile", [
-      "user" => $user,
-      "isUserProfile" => $this->isUserProfile($user["id"])
-    ]);
-  }
-
-  public function my_products()
-  {
-    if (!Application::$instance->session->hasUser())
-      return $this->render("authentication/login", ["error" => "Vous n'êtes pas connecté."]);
-
-    $user = Application::$instance->session->getUser();
-    $products = Application::$instance
-      ->database
-      ->findAll("products", ["seller_id" => $user["id"]]);
-
-    return $this->render("user/my-products", [
-      "user" => $user,
-      "products" => $products
-    ]);
-  }
-
-  private function isUserProfile($dbId)
-  {
-    if (!Application::$instance->session->hasUser())
-      return false;
-    return (bool)($dbId == Application::$instance->session->getUser()["id"]);
+    $this->redirect("", "home");
   }
 }

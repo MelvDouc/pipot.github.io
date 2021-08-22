@@ -1,0 +1,156 @@
+CONSEILS AUX DWWM/CDA pour L'ENTRETIEN COMPLEMENTAIRE/TECHNIQUE
+*****************************************************************
+
+
+MÉMOIRE TECHNIQUE :
+__________________
+
+Conseils :
+- Même si le mémoire technique peut être intégré au DP, il est conseillé d'en faire un document à part (toutefois, dans tous les cas le projet devra être inscrit dans le DP)
+- Min. 30 pages
+- Eviter de lire ou paraphraser son rapport pendant la soutenance
+- Présentation du rapport axée sur le vécu (historique du stage)
+- Détailler l'expression des besoins, les spécifications fonctionnelles et techniques, les outils utilisés, la phase de conception/modélisation, l'implémentation, les tests...
+- Difficultés rencontrées et solutions apportées
+- Prise de recul en conclusion : autocritique, améliorations possibles...
+- Possibilité de présenter plusieurs projets afin d'englober les différentes activités-types
+
+
+ENTRETIEN COMPLEMENTAIRE/TECHNIQUE :
+___________________________________
+
+Principes :
+- Jamais de questions pièges mais des questions simples, essentiellement théoriques, qui portent sur le référentiel : 9 fois sur 10 il s'agit simplement de répondre à des demandes de DÉFINITIONS, RÔLES, EXEMPLES (OUTILS, IMPLÉMENTATIONS...)
+Ex. Qu'est ce que "XXX" ? Connaissez-vous quelques exemples de "YYY" ? A quoi sert "ZZZ" ?
+- Réponses simples et rapides attendues (mieux vaut ne pas répondre que répondre au hasard)
+- Rester sobre en matière de langage (pas d'excès de zèle, éviter notamment de "flatter" les jurés...)
+- Tenue correcte conseillée
+
+Constat : les candidats sont souvent "intimidés" et perdent fréquemment leurs moyens à l'oral (les jurés peuvent parfois être - involontairement un peu "secs" en posant leur question..)  
+=> il est vivement conseillé de travailler la maitrise de soi et la résistance au stress : ex. entrainement à l'oral conseillé entre candidats...
+
+
+LISTE DES SUJETS (Q/R) HABITUELLEMENT ABORDES PENDANT L'ENTRETIEN 
+-----------------------------------------------------------------------------------------
+
+
+1) PHASES DE CONCEPTION D'UN SI / GESTION DE PROJET
+
+- Méthodes Agiles vs Cycle en V : phases, définitions, rôles...
+- Développement / Recette / Production
+
+
+2) MODÉLISATION (CDA principalement)
+
+- MCD, MLD et MPD (Merise) : formalisme, cardinalités, différences...
+- UML :
+. Vues (use-case view, logical view, process view) :
+. Diagrammes de structure : Diagramme de classes (class diagram), Diagramme d'objets (object diagram)
+. Diagrammes de comportement : Diagramme des cas d'utilisation (use-case diagram), Diagramme états-transitions (state machine diagram), Diagramme d'activité (activity diagram)
+. Diagrammes d'interaction : Diagramme de séquence (sequence diagram)
+
+=> Constats : énormément de confusions/mélanges entre les différents modèles & diagrammes chez les candidats
+
+
+3) BASES DE DONNÉES
+
+- SGBDR vs No-SQL
+- Structure/Fondamentaux d'une base (moteurs de stockage, tables, clés, index, structures de données, triggers, procédures stockées...)
+- Interfaces d'abstraction et drivers : PDO, ODBC...
+- Requêtes SQL de base (dont jointures)
+ de 2 ou 3 tables et réaliser une ou deux requêtes SQL (jointure, update...)
+=> Il est fréquemment demander au candidats de modéliser un petit MCD/MPD avec 2 ou 3 entités/tables et de réaliser une ou deux requêtes SQL (jointure, update...)
+
+
+4) POO
+
+Définitions, Typage, Classes, Propriétés, Méthodes, Langages...
+
+
+5) LANGAGES, PROTOCOLES, BIBLIOTHEQUES, API
+
+- Langage interprété vs compilé, client vs serveur
+- Fondamentaux de Java ou Php et JavaScript
+- Définitions (Ajax, JQuery, Web services, Json, Design Patterns, Charset...)
+- PHP 7 : principales nouveautés...
+- Tests : Définitions, Outils...
+
+
+6) WEB
+
+- Protocoles et infrastructures du Web
+- Gestion de sessions, cookies...
+- Bases du référencement (SEO)
+ 
+
+7) ARCHITECTURE & OUTILS
+
+- N-Tiers, MVC : Définitions, Intérêts, Exemples...
+- Framwewoks, CMS, IDE,  RAD
+
+
+8) SECURITE
+
+- Principales failles de sécurité web et moyens de contournement
+- Techniques de sécurité applicatives  : cryptage VS hashage
+
+
+9) MOBILITE
+
+- Responsive Design
+- Langages, Développement CrossPlatforms
+
+
+10) VERSIONNING / INTEGRATION / DEPLOIEMENT
+
+- Svn, Git...
+
+
+************************************************************************
+************************************************************************
+************************************************************************
+
+JURY DE TITRE PROFESSIONNEL : RAPPELS REGLEMENTAIRES 
+
+http://www.jurytitreprofessionnel.fr
+
+
+A] DÉCOUVREZ LA MISSION :
+http://www.jurytitreprofessionnel.fr/decouvrez-la-mission/
+
+Textes de référence :
+
+1) RÈGLEMENT DES SESSIONS D’EXAMEN :
+http://www.jurytitreprofessionnel.fr/uploads/REGLEMENT_GENERAL_SESSIONS.pdf
+
+2) (Extraits de la) CHARTE DE DÉONTOLOGIE :
+(http://www.jurytitreprofessionnel.fr//uploads/charte_deontologie.pdf)
+. LA NEUTRALITÉ :
+Le jury n’est pas une instance de recrutement. Vous faites abstraction de tout intérêt personnel et professionnel.
+Vous ne participez pas à l’évaluation ou aux délibérations du jury pour un candidat que vous connaissez personnellement ou professionnellement.
+. L’OBJECTIVITÉ DE L’ÉVALUATION :
+Vous évaluez les compétences professionnelles du candidat dans le cadre d’une mise en situation sans considération de son statut ou de ses particularités. 
+Cette évaluation est complétée par l’analyse approfondie de l’intégralité du dossier du candidat ; elle ne doit pas être influencée par d’autres éléments ou avis extérieurs. 
+Votre évaluation se fonde sur la prestation du candidat au regard des textes de référence de la certification visée : le référentiel de certification et le dossier technique d’évaluation.
+Les critères d’évaluation mesurent l’opérationnalité du candidat dans l’emploi, aussi, vous prenez du recul par rapport à vos propres procédures de travail et perception du métier.
+Vous notez les observations factuelles conduisant à votre décision sur les grilles d’évaluation qui seront conservées dans le dossier du candidat.
+. L’ÉGALITÉ DE TRAITEMENT :
+(...) Au cours de l’entretien final, qui n’est ni un test de contrôle de connaissances ni un oral de concours ou d’examen de fin de formation, vous conservez une attitude neutre et bienveillante.
+
+
+B] EVALUEZ LES CANDIDATS :
+http://www.jurytitreprofessionnel.fr/evaluez-les-candidats/
+
+Textes de référence :
+
+« L’épreuve » correspond à l’ensemble des modalités utilisées pour évaluer les compétences professionnelles des candidats : elle est basée principalement sur une mise en situation professionnelle réalisée dans un environnement réel ou reconstitué. Lorsqu’une mise en situation professionnelle est impossible à réaliser, il peut y avoir présentation d’un projet réalisé dans un  centre de formation ou en entreprise (NDLR : CAS LE PLUS FREQUENT)
+Afin d’évaluer l’ensemble des compétences professionnelles du titre professionnel, l’épreuve peut également comporter un entretien technique et/ou un questionnaire professionnel.
+Le cadre de l’épreuve est décrit dans votre dossier technique d’évaluation (DTE) : c’est ce cadre qui vous permet d’évaluer les compétences professionnelles des candidats tel que défini par le référentiel de certification.
+Vous devez le respecter, sans le modifier !
+
+Le jury peut-il refuser d'octroyer le titre à un candidat tout en validant tous les CCP ?
+OUI, lorsque le jury estime que la personne n’a pas la bonne posture, ne cerne pas bien le métier ou en a une vision incorrecte alors que les compétences techniques sont effectives. Dans ce cas le candidat se représentera à une session ultérieure pour repasser l’entretien final.
+
+Glossaire du Référentiel de certification (RC) :
+http://www.jurytitreprofessionnel.fr/uploads/Glossaire_RC.pdf
+

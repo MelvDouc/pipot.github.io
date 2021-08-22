@@ -29,11 +29,11 @@ class SiteController extends Controller
     if (!$id)
       return $this->redirectNotFound();
 
-    $category = Application::$instance->database->findOne("categories", ["id" => $id]);
+    $category = Application::$instance->database->findOne("categories", ["*"], ["id" => $id]);
     if (!$category)
       return $this->redirectNotFound();
    
-    $products = Application::$instance->database->findAll(Product::DB_TABLE, ["category_id" => $category["id"]]);
+    $products = Application::$instance->database->findAll(Product::DB_TABLE, ["*"], ["category_id" => $category["id"]]);
     
     return $this->render("categories/single", [
       "category" => $category,

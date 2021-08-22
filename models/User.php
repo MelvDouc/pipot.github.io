@@ -4,8 +4,9 @@ namespace app\models;
 
 use app\core\Application;
 use app\core\Email;
+use app\core\Model;
 
-class User
+class User extends Model
 {
   public const DB_TABLE = "users";
   private const USER_ROLES = [
@@ -14,7 +15,6 @@ class User
   ];
   private const USERNAME_REGEX = "/^[a-zA-Z0-9\_]{6,25}$/";
   private const PASSWORD_REGEX = "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,25}$/";
-  private const ERROR_EMPTY_FIELDS = "Veuillez remplir tous les champs.";
   private const ERROR_USERNAME_FORMAT = "Le nom d'utilisateur doit contenir entre 6 et 25 caractères, lesquels doivent êtres des lettres, des chiffres ou des tirets bas.";
   private const ERROR_USERNAME_EXISTS = "Nom d'utilisateur indisponible";
   private const ERROR_EMAIL_FORMAT = "Adresse email non valide.";
@@ -22,12 +22,12 @@ class User
   private const ERROR_PASSWORD_FORMAT = "Le mot de passe doit contenir entre 8 et 25 caractères dont au moins une minuscule, une majuscule et un chiffre.";
   private const ERROR_PASSWORDS_NO_MATCH = "Les mots de passe ne sont pas identiques.";
   private const ERROR_TERMS_NOT_AGREED = "Veuillez accepter les conditions d'utilisation.";
-  private string $username;
-  private string $email;
-  private string $plain_password;
-  private string $confirm_password;
-  private bool $agrees_terms;
-  private string $verification_string;
+  public string $username;
+  public string $email;
+  public string $plain_password;
+  public string $confirm_password;
+  public bool $agrees_terms;
+  public string $verification_string;
 
   public function __construct(array $post)
   {
@@ -43,7 +43,7 @@ class User
   {
     if (!preg_match(self::USERNAME_REGEX, $this->username))
       return self::ERROR_USERNAME_FORMAT;
-    if (Application::$instance->database->userValueExists("username", $this->username))
+    if (Application::$instance->database->valueExists(self::DB_TABLE, "username", $this->username))
       return self::ERROR_USERNAME_EXISTS;
     return 1;
   }
@@ -52,7 +52,7 @@ class User
   {
     if (!filter_var($this->email, FILTER_VALIDATE_EMAIL))
       return self::ERROR_EMAIL_FORMAT;
-    if (Application::$instance->database->userValueExists("email", $this->email))
+    if (Application::$instance->database->valueExists(self::DB_TABLE, "email", $this->email))
       return self::ERROR_EMAIL_EXISTS;
     return 1;
   }
@@ -69,7 +69,7 @@ class User
   public function validate(): string | int
   {
     if (!$this->username || !$this->email || !$this->plain_password || !$this->confirm_password)
-      return self::ERROR_EMPTY_FIELDS;
+      return parent::ERROR_EMPTY_FIELDS;
 
     if (!$this->agrees_terms)
       return self::ERROR_TERMS_NOT_AGREED;
@@ -93,7 +93,7 @@ class User
   {
     Application::$instance
       ->database
-      ->addUser($this->username, $this->email, $this->plain_password, $role, $this->verification_string);
+      ->addUser($this);
     unset($this->plain_password);
     unset($this->confirm_password);
   }

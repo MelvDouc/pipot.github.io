@@ -9,14 +9,15 @@ class Controller
     Application::$instance->router->renderView($page, $params);
   }
 
-  protected function redirect($location)
+  protected function redirect($location, $page, $params = [])
   {
-    return header("Location: $location");
+    header("Location: $location");
+    return $this->render($page, $params);
   }
 
-  protected function redirectNotFound()
+  protected function redirectNotFound($params = [])
   {
-    return $this->render("404");
+    return $this->render("404", $params);
   }
 
   protected function getParamId()

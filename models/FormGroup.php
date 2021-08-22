@@ -4,19 +4,19 @@ namespace app\models;
 
 class FormGroup
 {
-  public $labelText;
-  public $forNameId;
-  public $inputType;
-  public $maxLength;
-  public $isRequired;
+  public string $labelText;
+  public string $forNameId;
+  public string $inputType;
+  public int $maxLength;
+  public bool $isRequired;
 
-  public function __construct($labelText, $forNameId, $inputType, $maxLength = null, $isRequired = "true")
+  public function __construct(string $labelText, string $forNameId, string $inputType, int $maxLength = null, bool $isRequired = true)
   {
     $this->labelText = $labelText;
     $this->forNameId = $forNameId;
     $this->inputType = $inputType;
     if ($maxLength)
       $this->maxLength = $maxLength;
-    $this->isRequired = $isRequired;
+    $this->isRequired = ($isRequired === true) ? "true" : "";
   }
 }

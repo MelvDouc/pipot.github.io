@@ -1,0 +1,38 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Ajouter un article{% endblock %}
+
+{% block main %}
+  <h2>Ajouter un article</h2>
+
+  <div class="content">
+    <form action="/ajouter-article" method="POST" enctype="multipart/form-data">
+      {% for group in formGroups %}
+        <form-group
+          label-text="{{ group.labelText }}"
+          for-name-id="{{ group.forNameId }}"
+          input-type="{{ group.inputType }}"
+          is-required="{{ group.isRequired }}"
+          {% if group.maxLength %}
+            max-length="{{ group.maxLength }}"
+          {% endif %}
+        >
+        </form-group>        
+      {% endfor %}
+      <div class="form-select">
+        <label for="category">Catégorie</label>
+        <select name="category" id="category" required>
+          {% for category in categories %}
+            <option value="{{ category.id }}">{{ category.name | capitalize }}</option>
+          {% endfor %}
+        </select>
+      </div>
+        <form-submit text="Ajouter"></form-submit>
+    </form>
+
+    {% if error is defined %}
+      <div class="form-error">{{ error }}</div>
+    {% endif %}
+  </div>
+
+{% endblock %}

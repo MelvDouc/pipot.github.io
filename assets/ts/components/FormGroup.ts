@@ -3,7 +3,7 @@ export default class FormGroup extends HTMLElement {
   forNameId: string | null;
   inputType: string | null;
   maxLength: string | null;
-  isRequired: boolean;
+  isRequired: string | null;
 
   constructor() {
     super();
@@ -15,7 +15,7 @@ export default class FormGroup extends HTMLElement {
     this.removeAttribute("input-type");
     this.maxLength = this.getAttribute("max-length") ?? null;
     this.removeAttribute("max-length");
-    this.isRequired = Boolean(this.getAttribute("is-required"));
+    this.isRequired = this.getAttribute("is-required") ?? null;
     this.removeAttribute("is-required");
     this.innerHTML = this.createFormGroup();
     if (this.maxLength) {
@@ -25,10 +25,24 @@ export default class FormGroup extends HTMLElement {
     }
   }
 
-  createFormGroup() {
-    return `
-      <label for="${this.forNameId}">${this.labelText}</label>
-      <input id="${this.forNameId}" name="${this.forNameId}" type="${this.inputType}" required="${this.isRequired}" />
-    `;
+  createLabel(): string {
+    return `<label for="${this.forNameId}">${this.labelText}</label>`;
+  }
+
+  createInput(): string {
+    const mainAttributes: string[] = [
+      `id="${this.forNameId}"`,
+      `name="${this.forNameId}"`,
+    ];
+    if (this.isRequired)
+      mainAttributes.push(`required`);
+
+    if (this.inputType === "textarea")
+      return `<textarea ${mainAttributes.join(" ")}"></textarea>`;
+    return `<input type="${this.inputType}" ${mainAttributes.join(" ")} />`;
+  }
+
+  createFormGroup(): string {
+    return this.createLabel() + this.createInput();
   }
 }
