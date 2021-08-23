@@ -15,6 +15,13 @@ class Controller
     return $this->render($page, $params);
   }
 
+  protected function redirectToLogin()
+  {
+    return $this->redirect("connexion", "authentication/login", [
+      "error" => "Vous n'êtes pas connecté."
+    ]);
+  }
+
   protected function redirectNotFound($params = [])
   {
     return $this->render("404", $params);
@@ -26,5 +33,22 @@ class Controller
     if (!preg_match("/\d+/", $id))
       return null;
     return (int)$id;
+  }
+
+  protected function isUserProfile($dbId)
+  {
+    if (!Application::$instance->session->hasUser())
+      return false;
+    return (bool)($dbId == Application::$instance->session->getUser()["id"]);
+  }
+
+  protected function hasSessionUser(): bool
+  {
+    return Application::$instance->session->hasUser();
+  }
+
+  protected function getSessionUser(): array | false
+  {
+    return Application::$instance->session->getUser();
   }
 }

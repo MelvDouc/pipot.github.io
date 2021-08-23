@@ -9,6 +9,8 @@ $green1: limegreen;
 $green2: hsl(107, 67%, 41%);
 $green3: hsl(168, 40%, 45%);
 $green4: hsl(181, 69%, 25%);
+$green5: hsl(98, 40%, 60%);
+$green6: hsl(99, 42%, 52%);
 $orange1: hsl(34, 74%, 49%);
 $orange2: hsl(24, 100%, 50%);
 $silver1: hsl(213, 60%, 94%);
@@ -16,6 +18,7 @@ $silver2: hsl(222, 32%, 86%);
 $blue-gradient1: linear-gradient(315deg, $blue1 0%, $blue2 74%);
 $green-gradient1: linear-gradient(315deg, $green1 0%, $green2 74%);
 $green-gradient2: linear-gradient(to right, $green3, $green4);
+$green-gradient3: linear-gradient(to right, $green5, $green6);
 $orange-gradient1: linear-gradient(.75turn, $orange1 0%, $orange2 100%);
 $silver-gradient1: linear-gradient(315deg, $silver1 0%, $silver2 74%);
 

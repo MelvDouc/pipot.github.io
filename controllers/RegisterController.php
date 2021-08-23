@@ -5,7 +5,7 @@ namespace app\controllers;
 use app\core\Controller;
 use app\core\Application;
 use app\core\Request;
-use app\models\FormGroup;
+use app\models\Form;
 use app\models\User;
 
 class RegisterController extends Controller
@@ -13,14 +13,17 @@ class RegisterController extends Controller
   public function register(Request $request)
   {
     if (Application::$instance->session->hasUser())
-      return $this->redirect("/accueil");
+      return $this->redirect("", "accueil");
 
-    $formGroups = [
-      new FormGroup("Nom d'utilisateur", "username", "text", 25),
-      new FormGroup("Adresse email", "email", "email"),
-      new FormGroup("Mot de passe", "password", "password", 25),
-      new FormGroup("Confirmer mot de passe", "confirm_password", "password", 25)
-    ];
+    $form = new Form();
+    $form->start("/inscription", false, "register-form");
+    $form->add_input("Nom d'utilisateur", "username", "text");
+    $form->add_input("Adresse email", "email");
+    $form->add_input("Mot de passe", "password");
+    $form->add_input("Confirmer le mot de passe", "confirm_password", "password");
+    $form->add_checkbox("Accepter les conditions d'utilisation", "agree_terms");
+    $form->add_submit("S'inscrire");
+    $form->end();
 
     if ($request->isPost())
     {
@@ -29,7 +32,7 @@ class RegisterController extends Controller
 
       if ($validation !== 1)
         return $this->render("registration/index", [
-          "formGroups" => $formGroups,
+          "form" => $form->createView(),
           "error" => $validation
         ]);
 
@@ -42,7 +45,7 @@ class RegisterController extends Controller
     }
 
     $this->render("registration/index", [
-      "formGroups" => $formGroups
+      "form" => $form->createView()
     ]);
   }
 
@@ -50,9 +53,9 @@ class RegisterController extends Controller
   {
     $verification_string = explode("/", $_SERVER["REQUEST_URI"])[2];
     if (!$verification_string)
-      return $this->redirect("/accueil");
+      return $this->redirect("", "accueil");
     if (!Application::$instance->database->activateAccount($verification_string))
-      return $this->redirect("/accueil");
+      return $this->redirect("", "accueil");
     return $this->render("registration/verification");
   }
 }

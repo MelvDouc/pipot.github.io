@@ -25,7 +25,6 @@ class SiteController extends Controller
   public function category()
   {
     $id = $this->getParamId();
-
     if (!$id)
       return $this->redirectNotFound();
 
@@ -33,7 +32,7 @@ class SiteController extends Controller
     if (!$category)
       return $this->redirectNotFound();
    
-    $products = Application::$instance->database->findAll(Product::DB_TABLE, ["*"], ["category_id" => $category["id"]]);
+    $products = Application::$instance->database->findCategoryProducts((int)$category["id"]);
     
     return $this->render("categories/single", [
       "category" => $category,

@@ -11,7 +11,7 @@ class Login extends Model
   public const ERROR_INACTIVE_ACCOUNT = "Vous n'avez pas encore activé votre compte.";
   private string $uuid;
   private string $password;
-  private object | false $user;
+  private array | false $user;
 
   public function __construct($post)
   {
@@ -34,16 +34,17 @@ class Login extends Model
       "OR"
     );
 
-    if (!$this->user || !Application::$instance->database->isCorrectPassword($this->uuid, $this->password))
+    if (!$this->user || !password_verify($this->password, $this->user["password"]))
       return self::ERROR_WRONG_CREDENTIALS;
     
-    if ($this->user["is_account_active"] !== 1)
+    if ((int)$this->user["is_account_active"] !== 1) {
       return self::ERROR_INACTIVE_ACCOUNT;
+    }
 
     return 1;
   }
 
-  public function getUser(): object | false
+  public function getUser(): array | false
   {
     return $this->user;
   }

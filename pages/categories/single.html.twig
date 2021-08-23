@@ -8,7 +8,30 @@
   <div class="content">
     <ul>
       {% for product in products %}
-        <li>{{ product.name }}</li>
+        <li>
+          <div class="product-card">
+            <section class="left">
+              <img src="/build/img/products/{{ product.image }}" alt="{{ product.name }}">
+            </section>
+            <section class="right">
+              <h3><a href="/article/{{ product.id }}">{{ product.name | capitalize }}</a></h3>
+              <div class="detail">
+                <dl>
+                  <dt>Description</dt>
+                  <dd>{{ product.description | u.truncate(50) }}</dd>
+                  <dt>Prix</dt>
+                  <dd>{{ product.price }}</dd>
+                  <dt>Quantité disponible</dt>
+                  <dd>{{ product.quantity }}</dd>
+                  <dt>Vendu par</dt>
+                  <dd><a href="/profil/{{ product.seller_id }}">{{ product.seller }}</a></dd>
+                  <dt>Publié le</dt>
+                  <dd>{{ product.creation_date | date('d-m-Y') }}</dd>
+                </dl>
+              </div>
+            </section>
+          </div>
+        </li>
       {% endfor %}
     </ul>
   </div>

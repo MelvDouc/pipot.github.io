@@ -27,6 +27,7 @@ class User extends Model
   public string $plain_password;
   public string $confirm_password;
   public bool $agrees_terms;
+  public int $role = self::USER_ROLES["USER"];
   public string $verification_string;
 
   public function __construct(array $post)
@@ -89,7 +90,7 @@ class User extends Model
     return 1;
   }
 
-  public function save(int $role = self::USER_ROLES["USER"]): void
+  public function save(): void
   {
     Application::$instance
       ->database

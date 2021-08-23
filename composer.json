@@ -3,7 +3,9 @@
     "type": "project",
     "require": {
         "phpmailer/phpmailer": "^6.5",
-        "twig/twig": "^3.3"
+        "twig/twig": "^3.3",
+        "twig/string-extra": "^3.3",
+        "twig/extra-bundle": "^3.3"
     },
     "require-dev": {
         "vlucas/phpdotenv": "^5.3"

@@ -1,7 +1,7 @@
 form {
   display: flex;
 
-  form-submit {
+  .form-submit {
     @extend %gridCenter;
   }
 }
@@ -37,12 +37,12 @@ form {
   }
 }
 
-form-group,
-form-submit {
+.form-group,
+.form-submit {
   padding: .5em;
 }
 
-form-group {
+.form-group {
   display: flex;
   flex-direction: column;
 }

@@ -5,7 +5,7 @@ namespace app\controllers;
 use app\core\Request;
 use app\core\Controller;
 use app\core\Application;
-use app\models\FormGroup;
+use app\models\Form;
 use app\models\Login;
 
 class AuthController extends Controller
@@ -17,10 +17,12 @@ class AuthController extends Controller
         "flash_message" => "Vous êtes déjà connecté."
       ]);
 
-    $formGroups = [
-      new FormGroup("Nom d'utilisateur ou adresse email", "uuid", "text"),
-      new FormGroup("Mot de passe", "password", "password"),
-    ];
+    $form = new Form();
+    $form->start("/connexion", false, "login-form");
+    $form->add_input("Nom d'utilisateur ou adresse email", "uuid", "text");
+    $form->add_input("Mot de passe", "password");
+    $form->add_submit("Se connecter");
+    $form->end();
 
     if ($request->isPost()) {
       $login = new Login($_POST);
@@ -28,7 +30,7 @@ class AuthController extends Controller
 
       if ($validation !== 1)
         return $this->render("authentication/login", [
-          "formGroups" => $formGroups,
+          "form" => $form->createView(),
           "error" => $validation
         ]);
 
@@ -39,13 +41,13 @@ class AuthController extends Controller
     }
 
     return $this->render("authentication/login", [
-      "formGroups" => $formGroups
+      "form" => $form->createView()
     ]);
   }
 
   public function logout()
   {
     Application::$instance->session->removeUser();
-    $this->redirect("", "home");
+    $this->redirect("accueil", "home");
   }
 }

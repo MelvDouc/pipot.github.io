@@ -4,10 +4,39 @@
 
 {% block main %}
 
-  <h2>{{ product.name }}</h2>
+  <h2>Fiche article - {{ product.name }}</h2>
 
   <div class="content">
-      
+    <div class="product-page">
+      <section class="left">
+        <img src="/build/img/products/{{ product.image }}" alt="{{ product.name }}">
+      </section>
+      <section class="right">
+        <h3>Détails</h3>
+        <div class="detail">
+          <dl>
+            <dt>Description</dt>
+            <dd>{{ product.description }}</dd>
+            <dt>Prix en Pipots</dt>
+            <dd>{{ product.price }}</dd>
+            <dt>Quantité disponible</dt>
+            <dd>{{ product.quantity }}</dd>
+            <dt>Publié par</dt>
+            <dd><a href="/profil/{{ product.seller_id }}">{{ product.seller }}</a></dd>
+            <dt>Publié le</dt>
+            <dd>{{ product.creation_date | date('Y-m-d') }}</dd>
+            <dt>Catégorie</dt>
+            <dd><a href="/categorie/{{ product.category_id }}">{{ product.category }}</a></dd>
+          </dl>
+        </div>
+      </section>
+    </div>
+
+    {% if is_addable_to_basket %}
+      <form action="/ajouter-au-panier/{{ product.id }}" method="POST">
+        <button class="button" type="submit">Ajouter</button>
+      </form>
+    {% endif %}
   </div>
 
 {% endblock %}

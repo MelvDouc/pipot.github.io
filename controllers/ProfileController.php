@@ -9,13 +9,6 @@ use app\core\Application;
 
 class ProfileController extends Controller
 {
-  private function isUserProfile($dbId)
-  {
-    if (!Application::$instance->session->hasUser())
-      return false;
-    return (bool)($dbId == Application::$instance->session->getUser()["id"]);
-  }
-
   public function profile()
   {
     $id = $this->getParamId();
@@ -24,7 +17,7 @@ class ProfileController extends Controller
 
     $user = Application::$instance
       ->database
-      ->findOne(User::DB_TABLE, ["id" => $id]);
+      ->findOne(User::DB_TABLE, ["*"], ["id" => $id]);
     if (!$user)
       return $this->redirectNotFound();
 
@@ -36,12 +29,10 @@ class ProfileController extends Controller
 
   public function my_profile()
   {
-    if (!Application::$instance->session->hasUser())
-      return $this->redirect("connexion", "authentication/login", [
-        "error" => "Vous n'êtes pas connecté."
-      ]);
+    if (!$this->hasSessionUser())
+      return $this->redirectToLogin();
 
-    $user = Application::$instance->session->getUser();
+    $user = $this->getSessionUser();
 
     return $this->render("user/my-profile", [
       "user" => $user
@@ -50,12 +41,10 @@ class ProfileController extends Controller
 
   public function my_products()
   {
-    if (!Application::$instance->session->hasUser())
-      return $this->redirect("connexion", "authentication/login", [
-        "error" => "Vous n'êtes pas connecté."
-      ]);
+    if (!$this->hasSessionUser())
+      return $this->redirectToLogin();
 
-    $user = Application::$instance->session->getUser();
+    $user = $this->getSessionUser();
     $user["products"] = Application::$instance->database->findAll(
       Product::DB_TABLE,
       ["*"],

@@ -7,28 +7,7 @@
   <h2>Inscription</h2>
 
   <div class="content">
-
-    <form action="/inscription" method="POST">
-      {% for group in formGroups %}
-        <form-group
-          label-text="{{ group.labelText }}"
-          for-name-id="{{ group.forNameId }}"
-          input-type="{{ group.inputType }}"
-          is-required="{{ group.isRequired }}"
-          {% if group.maxLength %}
-            max-length="{{ group.maxLength }}"
-          {% endif %}
-        >
-        </form-group>
-      {% endfor %}
-      <div class="form-checkbox">
-        <input type="checkbox" name="agree_terms" id="agree_terms">
-        <label for="agree_terms">Accepter les conditions d'utilisation</label>
-      </div>
-      <div class="form-submit">
-        <button type="submit">S'inscrire</button>
-      </div>
-    </form>
+    {{ form | raw }}
 
     <p>Déjà un compte ? <a href="/connexion">Se connecter</a></p>
 

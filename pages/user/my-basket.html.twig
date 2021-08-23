@@ -1,0 +1,60 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Panier de {{ user.username }}{% endblock %}
+
+{% block main %}
+
+  <h2>Panier de {{ user.username }}</h2>
+
+  <div class="content">
+  
+    {% if error_message is defined %}
+      <div class="error_message">{{ error_message }}</div>
+    {% endif %}
+
+    {% if success_message is defined %}
+      <div class="success_message">{{ success_message }}</div>
+    {% endif %}
+
+    {% if user.basket is empty %}
+      <p>Votre panier est vide. Vous pouvez jeter un oeil à la <a href="/categories">page des catégories</a> et ajouter les articles qui vous intéressent.</p>
+    {% endif %}
+
+    <ul>
+      {% for product in user.basket %}
+        <li>
+          <div class="product-card">
+            <section class="left">
+              <img src="/build/img/products/{{ product.image }}" alt="{{ product.name }}">
+            </section>
+            <section class="right">
+              <h3><a href="/article/{{ product.product_id }}">{{ product.name | capitalize }}</a></h3>
+              <div class="detail">
+                <dl>
+                  <dt>Description</dt>
+                  <dd>{{ product.description | u.truncate(50) }}</dd>
+                  <dt>Prix</dt>
+                  <dd>{{ product.price }}</dd>
+                  <dt>Quantité disponible</dt>
+                  <dd>{{ product.quantity }}</dd>
+                  <dt>Vendu par</dt>
+                  <dd><a href="/profil/{{ product.seller_id }}">{{ product.seller_username }}</a></dd>
+                  <dt>Catégorie</dt>
+                  <dd><a href="/categorie/{{ product.category_id }}">{{ product.category }}</a></dd>
+                  <dt>Publié le</dt>
+                  <dd>{{ product.creation_date | date('d-m-Y') }}</dd>
+                </dl>
+              </div>
+              <div class="actions">
+                <form method="POST" action="/supprimer-du-panier/{{ product.cart_id }}">
+                  <button class="button" type="submit">Supprimer</button>
+                </form>
+              </div>
+            </section>
+          </div>
+        </li>
+      {% endfor %}
+    </ul>
+  
+  </div>
+{% endblock %}
