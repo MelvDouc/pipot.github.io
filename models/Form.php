@@ -8,14 +8,14 @@ class Form
   private string $closing_tag;
   private array $fields;
 
-  public function start($action, bool $supports_files, $class = null)
+  public function start($action, bool $supports_files, $class = null): void
   {
     $class_attribute = ($class) ? "class='$class'" : "";
     $enctype = ($supports_files) ? "enctype='multipart/form-data'" : "";
     $this->opening_tag = "<form method='POST' action='$action' $enctype $class_attribute>";
   }
 
-  public function end()
+  public function end(): void
   {
     $this->closing_tag = "</form>";
   }
@@ -33,7 +33,7 @@ class Form
     return "<label for='$name'>$label_text</label>";
   }
 
-  public function add_input(string $label_text, string $name, string $type = "", bool $is_required = true, array $attributes = [])
+  public function add_input(string $label_text, string $name, string $type = "", bool $is_required = true, array $attributes = []): void
   {
     if (!$type) $type = $name;
     $attributes = $this->stringify_attributes($attributes);
@@ -43,7 +43,7 @@ class Form
     $this->fields[] = "<div class='form-group'>$label $input</div>";
   }
 
-  public function add_textarea(string $label_text, string $name, bool $is_required = true, array $attributes = [])
+  public function add_textarea(string $label_text, string $name, bool $is_required = true, array $attributes = []): void
   {
     $attributes = $this->stringify_attributes($attributes);
     $required_attribute = ($is_required) ? "required" : "";
@@ -52,14 +52,14 @@ class Form
     $this->fields[] = "<div class='form-group'>$label $textarea</div>";
   }
 
-  public function add_checkbox(string $label_text, string $name)
+  public function add_checkbox(string $label_text, string $name): void
   {
     $label = $this->get_label($label_text, $name);
     $checkbox = "<input type='checkbox' id='$name' name='$name'>";
     $this->fields[] = "<div class='form-checkbox'>$checkbox $label</div>";
   }
 
-  public function add_submit(string $text = "Valider")
+  public function add_submit(string $text = "Valider"): void
   {
     $this->fields[] = "<div class='form-submit'>
       <button class='button' type='submit'>$text</button>

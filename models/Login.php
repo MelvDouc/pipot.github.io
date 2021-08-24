@@ -13,7 +13,7 @@ class Login extends Model
   private string $password;
   private array | false $user;
 
-  public function __construct($post)
+  public function __construct(array $post)
   {
     $this->uuid = $post["uuid"] ?? null;
     $this->password = $post["password"] ?? null;
@@ -36,7 +36,7 @@ class Login extends Model
 
     if (!$this->user || !password_verify($this->password, $this->user["password"]))
       return self::ERROR_WRONG_CREDENTIALS;
-    
+
     if ((int)$this->user["is_account_active"] !== 1) {
       return self::ERROR_INACTIVE_ACCOUNT;
     }

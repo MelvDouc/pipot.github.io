@@ -10,10 +10,10 @@ use Dotenv\Dotenv;
 class Database
 {
   private PDO $db;
-  private $host;
-  private $db_name;
-  private $user;
-  private $password;
+  private string $host;
+  private string $db_name;
+  private string $user;
+  private string $password;
 
   public function __construct()
   {
@@ -25,7 +25,7 @@ class Database
     $this->password = $_ENV["DB_PASSWORD"];
   }
 
-  public function connect()
+  public function connect(): void
   {
     try {
       $this->db = new \PDO("mysql:host=$this->host;dbname=$this->db_name;charset=utf8", $this->user, $this->password);
@@ -35,7 +35,7 @@ class Database
     }
   }
 
-  public function addUser(User $user)
+  public function addUser(User $user): bool
   {
     $hashedPassword = password_hash($user->plain_password, PASSWORD_DEFAULT);
     $sql = "INSERT INTO users (username, email, password, role, verification_string, is_account_active, register_date)
@@ -46,10 +46,10 @@ class Database
     $statement->bindParam(":password", $hashedPassword, \PDO::PARAM_STR);
     $statement->bindParam(":role", $user->role, \PDO::PARAM_INT);
     $statement->bindParam(":verification_string", $user->verification_string, \PDO::PARAM_STR);
-    $statement->execute();
+    return $statement->execute();
   }
 
-  public function addProduct(Product $product)
+  public function addProduct(Product $product): bool
   {
     $sql = "INSERT INTO products (name, description, price, quantity, seller_id, category_id, image, creation_date)
      VALUES (:name, :description, :price, :quantity, :seller_id, :category_id, :image, NOW());";
@@ -61,10 +61,10 @@ class Database
     $statement->bindParam(":seller_id", $product->seller_id, \PDO::PARAM_INT);
     $statement->bindParam(":category_id", $product->category_id, \PDO::PARAM_INT);
     $statement->bindParam(":image", $product->image, \PDO::PARAM_STR);
-    $statement->execute();
+    return $statement->execute();
   }
 
-  public function getBasket($user_id)
+  public function getBasket(int $user_id): array | false
   {
     $columns = "cart.id AS cart_id, product_id, products.name AS name, products.description, price, quantity, image, cart.category_id,
     categories.name AS category, cart.seller_id, users.username AS seller_username, creation_date";
@@ -79,17 +79,20 @@ class Database
 
   public function addToBasket(array $product, int $buyer_id): bool
   {
+    $product_id = (int)$product["id"];
+    $category_id = (int)$product["category_id"];
+    $seller_id = (int)$product["seller_id"];
     $sql = "INSERT INTO cart (product_id, category_id, seller_id, buyer_id, added_at)
       VALUES (:product_id, :category_id, :seller_id, :buyer_id, NOW());";
     $statement = $this->db->prepare($sql);
-    $statement->bindParam(":product_id", (int)$product["id"], \PDO::PARAM_INT);
-    $statement->bindParam(":category_id", (int)$product["category_id"], \PDO::PARAM_INT);
-    $statement->bindParam(":seller_id", (int)$product["seller_id"], \PDO::PARAM_INT);
+    $statement->bindParam(":product_id", $product_id, \PDO::PARAM_INT);
+    $statement->bindParam(":category_id", $category_id, \PDO::PARAM_INT);
+    $statement->bindParam(":seller_id", $seller_id, \PDO::PARAM_INT);
     $statement->bindParam(":buyer_id", $buyer_id, \PDO::PARAM_INT);
     return $statement->execute();
   }
 
-  public function deleteFromBasket(int $cart_id)
+  public function deleteFromBasket(int $cart_id): bool
   {
     $sql = "DELETE FROM cart WHERE id = $cart_id;";
     $statement = $this->db->prepare($sql);
@@ -118,13 +121,13 @@ class Database
     return $sql;
   }
 
-  public function findOne(string $table, array $columns = ["*"], array $where = [], string $connector = "AND")
+  public function findOne(string $table, array $columns = ["*"], array $where = [], string $connector = "AND"): array | false
   {
     $sql = $this->formatSearchQuery($table, $columns, $where, $connector);
     return $this->db->query($sql)->fetch();
   }
 
-  public function findAll(string $table, array $columns = ["*"], array $where = [], string $connector = "AND")
+  public function findAll(string $table, array $columns = ["*"], array $where = [], string $connector = "AND"): array | false
   {
     $sql = $this->formatSearchQuery($table, $columns, $where, $connector);
     return $this->db->query($sql)->fetchAll();
@@ -162,18 +165,19 @@ class Database
     return $this->db->query($sql)->fetchAll();
   }
 
-  public function valueExists($table, $column, $value)
+  public function valueExists(string $table, string $column, string | int $value): bool
   {
-    $sql = "SELECT * FROM $table WHERE $column = '$value';";
+    if (gettype($value) === "string")
+      $value = "'" . $value . "'";
+    $sql = "SELECT * FROM $table WHERE $column = $value;";
     return (bool)($this->db->query($sql)->fetch());
   }
 
-  public function activateAccount($verification_string)
+  public function activateAccount(string $verification_string): bool
   {
     $sql = "UPDATE users SET is_account_active = 1, verification_string = '' WHERE verification_string = ?;";
     $statement = $this->db->prepare($sql);
     $statement->bindParam(1, $verification_string, \PDO::PARAM_STR);
-    $statement->execute();
-    return $statement->rowCount();
+    return $statement->execute();
   }
 }

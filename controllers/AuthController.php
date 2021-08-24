@@ -12,9 +12,9 @@ class AuthController extends Controller
 {
   public function login(Request $request)
   {
-    if (Application::$instance->session->hasUser())
-      return $this->redirect("accueil", "home", [
-        "flash_message" => "Vous êtes déjà connecté."
+    if ($this->hasSessionUser())
+      return $this->redirect("/accueil", "home", [
+        "error_message" => "Vous êtes déjà connecté."
       ]);
 
     $form = new Form();
@@ -24,30 +24,29 @@ class AuthController extends Controller
     $form->add_submit("Se connecter");
     $form->end();
 
-    if ($request->isPost()) {
-      $login = new Login($_POST);
-      $validation = $login->validate();
-
-      if ($validation !== 1)
-        return $this->render("authentication/login", [
-          "form" => $form->createView(),
-          "error" => $validation
-        ]);
-
-      $login->setLoggedUser();
-      return $this->redirect("mon-profil", "user/my-profile", [
-        "user" => $login->getUser()
+    if ($request->isGet())
+      return $this->render("authentication/login", [
+        "form" => $form->createView()
       ]);
-    }
 
-    return $this->render("authentication/login", [
-      "form" => $form->createView()
+    $login = new Login($_POST);
+    $validation = $login->validate();
+
+    if ($validation !== 1)
+      return $this->render("authentication/login", [
+        "form" => $form->createView(),
+        "error_message" => $validation
+      ]);
+
+    $login->setLoggedUser();
+    return $this->redirect("/mon-profil", "user/my-profile", [
+      "user" => $login->getUser()
     ]);
   }
 
   public function logout()
   {
     Application::$instance->session->removeUser();
-    $this->redirect("accueil", "home");
+    return $this->redirect("/accueil", "home");
   }
 }

@@ -4,7 +4,6 @@ namespace app\core;
 
 use Dotenv\Dotenv;
 use Exception;
-use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\PHPMailer;
 
 $dotenv = Dotenv::createImmutable(Application::$ROOT_DIR);
@@ -12,7 +11,7 @@ $dotenv->load();
 
 class Email
 {
-  private const SMTPDebug = /* SMTP::DEBUG_SERVER */ 0;
+  private const SMTPDebug = 0;
   private const HOST = "smtp.gmail.com";
   private PHPMailer $email;
   private string $recipient_address;

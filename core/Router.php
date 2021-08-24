@@ -11,18 +11,18 @@ class Router
   public Response $response;
   protected $routes = [];
 
-  public function __construct($request, $response)
+  public function __construct(Request $request, Response $response)
   {
     $this->request = $request;
     $this->response = $response;
   }
 
-  public function get($path, $callback)
+  public function get(string $path, array $callback): void
   {
     $this->routes["get"][$path] = $callback;
   }
 
-  public function post($path, $callback)
+  public function post(string $path, array $callback): void
   {
     $this->routes["post"][$path] = $callback;
   }
@@ -49,7 +49,7 @@ class Router
     call_user_func($callback, $this->request);
   }
 
-  public function renderView($view, $params = [])
+  public function renderView(string $view, array $params = []): void
   {
     $loader = new \Twig\Loader\FilesystemLoader(Application::$ROOT_DIR  . "/pages");
     $twig = new \Twig\Environment($loader);

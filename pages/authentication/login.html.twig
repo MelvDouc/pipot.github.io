@@ -11,10 +11,8 @@
 
     <p>Pas encore de compte ? <a href="/inscription">S'inscrire</a></p>
 
-    {% if error is defined %}
-      <div class="login-error">
-        {{ error }}
-      </div>
+    {% if error_message is defined %}
+      <div class="error_message">{{ error_message }}</div>
     {% endif %}
   </div>
 {% endblock %}

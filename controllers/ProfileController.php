@@ -3,15 +3,15 @@
 namespace app\controllers;
 
 use app\models\User;
-use app\models\Product;
 use app\core\Controller;
 use app\core\Application;
+use app\core\Request;
 
 class ProfileController extends Controller
 {
-  public function profile()
+  public function profile(Request $request)
   {
-    $id = $this->getParamId();
+    $id = $request->getParamId();
     if (!$id)
       return $this->redirectNotFound;
 
@@ -44,12 +44,8 @@ class ProfileController extends Controller
     if (!$this->hasSessionUser())
       return $this->redirectToLogin();
 
+    Application::$instance->session->updateProducts();
     $user = $this->getSessionUser();
-    $user["products"] = Application::$instance->database->findAll(
-      Product::DB_TABLE,
-      ["*"],
-      ["seller_id" => $user["id"]]
-    );
 
     return $this->render("user/my-products", [
       "user" => $user,

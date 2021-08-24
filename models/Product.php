@@ -30,7 +30,7 @@ class Product extends Model
   {
     $is_price_valid = isset($post["price"]) && is_numeric($post["price"]);
     $is_quantity_valid = isset($post["quantity"]) && is_numeric($post["quantity"]);
-    
+
     $this->name = $post["name"] ?? null;
     $this->description = $post["description"] ?? null;
     $this->price = ($is_price_valid) ? (int)$post["price"] : null;
@@ -53,7 +53,7 @@ class Product extends Model
     return 1;
   }
 
-  private function validate_file_data()
+  private function validate_file_data(): string | int
   {
     extract($this->image_info);
     if ($error === 4)
@@ -65,21 +65,23 @@ class Product extends Model
     return 1;
   }
 
-  private function validate_category()
+  private function validate_category(): string | int
   {
-    if (!Application::$instance->database->valueExists("categories", "id", $this->category_id))
+    if (!Application::$instance
+      ->database
+      ->valueExists("categories", "id", $this->category_id))
       return self::ERROR_NO_CATEGORY;
     return 1;
   }
 
-  public function validate()
+  public function validate(): string | int
   {
     $post_validation = $this->validate_post_data();
     if ($post_validation !== 1)
       return $post_validation;
 
     $file_validation = $this->validate_file_data();
-    if($file_validation !== 1)
+    if ($file_validation !== 1)
       return $file_validation;
 
     $category_validation = $this->validate_category();
@@ -89,7 +91,7 @@ class Product extends Model
     return 1;
   }
 
-  private function saveImage()
+  private function saveImage(): void
   {
     if ($this->image_info["error"] === 4) {
       $this->image = "_default.jpg";

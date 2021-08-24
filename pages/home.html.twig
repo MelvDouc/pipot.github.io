@@ -5,8 +5,12 @@
 {% block main %}
   <h2>Accueil</h2>
 
-  {% if flash_message is defined %}
-    <div class="flash-message">{{ flash_message }}</div>
+  {% if success_message is defined %}
+    <div class="success_message">{{ success_message }}</div>
+  {% endif %}
+
+  {% if error_message is defined %}
+    <div class="error_message">{{ error_message }}</div>
   {% endif %}
 
   <div class="content">
