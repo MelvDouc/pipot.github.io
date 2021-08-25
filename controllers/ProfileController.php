@@ -9,21 +9,35 @@ use app\core\Request;
 
 class ProfileController extends Controller
 {
+  private function isUserProfile(int $param_id): bool
+  {
+    if (!$this->hasSessionUser())
+      return false;
+    $sessionUser = $this->getSessionUser();
+    $sessionId = (int)$sessionUser["id"];
+    return $param_id === $sessionId;
+  }
+
+  private function getParamUser(int $param_id): array | false
+  {
+    return Application::$instance
+      ->database
+      ->findOne(User::DB_TABLE, ["*"], ["id" => $param_id]);
+  }
+
   public function profile(Request $request)
   {
     $id = $request->getParamId();
     if (!$id)
-      return $this->redirectNotFound;
+      return $this->redirectNotFound();
 
-    $user = Application::$instance
-      ->database
-      ->findOne(User::DB_TABLE, ["*"], ["id" => $id]);
+    $user = $this->getParamUser($id);
     if (!$user)
       return $this->redirectNotFound();
 
     return $this->render("user/profile", [
       "user" => $user,
-      "isUserProfile" => $this->isUserProfile($user["id"])
+      "isUserProfile" => $this->isUserProfile($id)
     ]);
   }
 
@@ -34,8 +48,9 @@ class ProfileController extends Controller
 
     $user = $this->getSessionUser();
 
-    return $this->render("user/my-profile", [
-      "user" => $user
+    return $this->render("user/profile", [
+      "user" => $user,
+      "isUserProfile" => true
     ]);
   }
 

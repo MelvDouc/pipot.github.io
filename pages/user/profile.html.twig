@@ -5,13 +5,12 @@
 {% block main %}
 
   <h2>Profil de {{ user.username }}</h2>
+  
+  {% if isUserProfile %}
+    {% include "_partials/user-nav.html.twig" %}
+  {% endif %}
 
   <div class="content">
 
-    {% if isUserProfile is defined and isUserProfile == true %}
-      <form action="/deconnexion" method="POST">
-        <button type="submit">Déconnexion</button>
-      </form>
-    {% endif %}
   </div>
 {% endblock %}

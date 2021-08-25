@@ -6,6 +6,8 @@
 
   <h2>Panier de {{ user.username }}</h2>
 
+  {% include "_partials/user-nav.html.twig" %}
+
   <div class="content">
   
     {% if error_message is defined %}
@@ -46,7 +48,7 @@
                 </dl>
               </div>
               <div class="actions">
-                <form method="POST" action="/supprimer-du-panier/{{ product.cart_id }}">
+                <form method="POST" action="/supprimer-du-panier/{{ product.basket_id }}">
                   <button class="button" type="submit">Supprimer</button>
                 </form>
               </div>

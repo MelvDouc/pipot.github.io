@@ -1,0 +1,37 @@
+.user-nav {
+  
+  ul, li, a, form {
+    width: 100%;
+  }
+
+  ul {
+    display: flex;
+
+    li {
+      @extend %gridCenter;
+      padding: .66em;
+      background: $green4;
+      background: $green-gradient2;
+      color: white;
+
+      &:hover {
+        background: $green3;
+        background: $green-gradient2b;
+      }
+
+      a, form {
+        @extend %gridCenter;
+      }
+
+      a {
+        text-decoration: none;
+      }
+
+      form input {
+        all: unset;
+        cursor: pointer;
+        color: inherit;
+      }
+    }
+  }
+}

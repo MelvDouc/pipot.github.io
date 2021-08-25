@@ -6,11 +6,40 @@
 
   <h2>Articles de {{ user.username }}</h2>
 
+  {% include "_partials/user-nav.html.twig" %}
+
   <div class="content">
   
     <ul>
       {% for product in user.products %}
-        <li>{{ product.name }}</li>
+        <li>
+          <div class="product-card">
+            <section class="left">
+              <img src="/build/img/products/{{ product.image }}" alt="{{ product.name }}">
+            </section>
+            <section class="right">
+              <h3><a href="/article/{{ product.id }}">{{ product.name | capitalize }}</a></h3>
+              <div class="detail">
+                <dl>
+                  <dt>Description</dt>
+                  <dd>{{ product.description | u.truncate(50) }}</dd>
+                  <dt>Prix</dt>
+                  <dd>{{ product.price }}</dd>
+                  <dt>Quantité disponible</dt>
+                  <dd>{{ product.quantity }}</dd>
+                  <dt>Catégorie</dt>
+                  <dd>{{ product.category }}</dd>
+                  <dt>Publié le</dt>
+                  <dd>{{ product.creation_date | date('d-m-Y') }}</dd>
+                </dl>
+              </div>
+              <div class="actions">
+              <button class="button"><a href="/modifier-article/{{ product.id }}">Modifier</a></button>
+              <form action="/supprimer-article/{{ product.id }}"><input type="submit" value="Supprimer"></form>
+              </div>
+            </section>
+          </div>
+        </li>
       {% endfor %}
     </ul>
   

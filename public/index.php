@@ -24,6 +24,9 @@ $app->get("categories", [CategoryController::class, "categories"]);
 $app->get("article", [ProductController::class, "product"]);
 $app->get("ajouter-article", [ProductController::class, "add"]);
 $app->post("ajouter-article", [ProductController::class, "add"]);
+$app->get("modifier-article", [ProductController::class, "update"]);
+$app->post("modifier-article", [ProductController::class, "update"]);
+$app->post("supprimer-article", [ProductController::class, "delete"]);
 
 // Panier
 $app->get("mon-panier", [BasketController::class, "my_basket"]);

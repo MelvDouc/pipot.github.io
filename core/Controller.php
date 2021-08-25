@@ -27,13 +27,6 @@ class Controller
     return $this->render("404", $params);
   }
 
-  protected function isUserProfile(int $database_id): bool
-  {
-    if (!Application::$instance->session->hasUser())
-      return false;
-    return (bool)($database_id === (int)Application::$instance->session->getUser()["id"]);
-  }
-
   protected function hasSessionUser(): bool
   {
     return Application::$instance->session->hasUser();

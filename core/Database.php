@@ -28,7 +28,11 @@ class Database
   public function connect(): void
   {
     try {
-      $this->db = new \PDO("mysql:host=$this->host;dbname=$this->db_name;charset=utf8", $this->user, $this->password);
+      $this->db = new \PDO(
+        "mysql:host=$this->host;dbname=$this->db_name;charset=utf8",
+        $this->user,
+        $this->password
+      );
       $this->db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
     } catch (\PDOException $e) {
       echo $e->getMessage();
@@ -64,15 +68,33 @@ class Database
     return $statement->execute();
   }
 
+  public function updateProduct(int $product_id, array $updated_columns): bool
+  {
+    if (!$updated_columns)
+      return true;
+    $column_names = implode(", ", array_keys($updated_columns));
+    $values = preg_replace("/(\w+)/", "$1 = ?", $column_names);
+    $sql = "UPDATE products SET $values WHERE id = $product_id;";
+    $statement = $this->db->prepare($sql);
+    $i = 1;
+    foreach ($updated_columns as $key => &$value) {
+      $type = (gettype($value) === "integer") ? \PDO::PARAM_INT : \PDO::PARAM_STR;
+      $statement->bindParam($i, $value, $type);
+      $i++;
+    }
+    return $statement->execute();
+  }
+
   public function getBasket(int $user_id): array | false
   {
-    $columns = "cart.id AS cart_id, product_id, products.name AS name, products.description, price, quantity, image, cart.category_id,
-    categories.name AS category, cart.seller_id, users.username AS seller_username, creation_date";
+    $columns = "basket.id AS basket_id, product_id, products.name AS name, products.description,
+    price, quantity, image, products.category_id, categories.name AS category,
+    basket.seller_id, users.username AS seller_username, creation_date";
     $sql = "SELECT $columns
-    FROM cart
-    JOIN products ON cart.product_id = products.id
-    JOIN users ON cart.seller_id = users.id
-    JOIN categories ON cart.category_id = categories.id
+    FROM basket
+    JOIN products ON basket.product_id = products.id
+    JOIN users ON basket.seller_id = users.id
+    JOIN categories ON products.category_id = categories.id
     WHERE buyer_id = $user_id;";
     return $this->db->query($sql)->fetchAll();
   }
@@ -82,7 +104,7 @@ class Database
     $product_id = (int)$product["id"];
     $category_id = (int)$product["category_id"];
     $seller_id = (int)$product["seller_id"];
-    $sql = "INSERT INTO cart (product_id, category_id, seller_id, buyer_id, added_at)
+    $sql = "INSERT INTO basket (product_id, category_id, seller_id, buyer_id, added_at)
       VALUES (:product_id, :category_id, :seller_id, :buyer_id, NOW());";
     $statement = $this->db->prepare($sql);
     $statement->bindParam(":product_id", $product_id, \PDO::PARAM_INT);
@@ -92,9 +114,9 @@ class Database
     return $statement->execute();
   }
 
-  public function deleteFromBasket(int $cart_id): bool
+  public function deleteFromBasket(int $basket_id): bool
   {
-    $sql = "DELETE FROM cart WHERE id = $cart_id;";
+    $sql = "DELETE FROM basket WHERE id = $basket_id;";
     $statement = $this->db->prepare($sql);
     return $statement->execute();
   }
@@ -144,6 +166,17 @@ class Database
     JOIN categories ON category_id = categories.id
     WHERE products.id = $id;";
     return $this->db->query($sql)->fetch();
+  }
+
+  public function findProductsByUserId(int $id): array | false
+  {
+    $sql = "SELECT
+    products.id, products.name, products.description, price, quantity, seller_id,
+    category_id, categories.name AS category, image, products.creation_date
+    FROM `products`
+    JOIN categories ON category_id = categories.id
+    WHERE seller_id = $id;";
+    return $this->db->query($sql)->fetchAll();
   }
 
   public function findCategoryProducts(int $category_id): array | false

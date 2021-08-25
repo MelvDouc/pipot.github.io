@@ -8,7 +8,50 @@ use app\core\Model;
 class Product extends Model
 {
   public const DB_TABLE = "products";
+  public const DB_COLUMNS = [
+    "name" => [
+      "updatable" => true,
+      "type" => "string",
+      "from_post" => true
+    ],
+    "description" => [
+      "updatable" => true,
+      "type" => "string",
+      "from_post" => true
+    ],
+    "price" => [
+      "updatable" => true,
+      "type" => "integer",
+      "from_post" => true
+    ],
+    "quantity" => [
+      "updatable" => true,
+      "type" => "integer",
+      "from_post" => true
+    ],
+    "seller_id" => [
+      "updatable" => false,
+      "type" => "integer",
+      "from_post" => false
+    ],
+    "category_id" => [
+      "updatable" => true,
+      "type" => "integer",
+      "from_post" => true
+    ],
+    "image" => [
+      "updatable" => true,
+      "type" => "string",
+      "from_post" => false
+    ],
+    "creation_date" => [
+      "updatable" => false,
+      "type" => "string",
+      "from_post" => false
+    ],
+  ];
   public const NAME_MAX_LENGTH = 50;
+  public const DEFAULT_IMAGE = "_default.jpg";
   public const VALID_IMAGE_TYPES = ["image/jpeg", "image/png", "image/jpeg", "image/gif"];
   public const MAX_IMAGE_SIZE = 2e6;
   public const ERROR_NAME_TOO_LONG = "Le nom du produit ne doit pas dépasser " . self::NAME_MAX_LENGTH . " caractères.";
@@ -17,27 +60,32 @@ class Product extends Model
   public const ERROR_INVALID_FILE_TYPE = "L'image doit être au format jpeg, png ou gif.";
   public const ERROR_FILE_TOO_LARGE = "Le fichier image ne doit pas faire plus de 2 MO.";
   public const ERROR_NO_CATEGORY = "Catégorie non trouvée.";
-  public string $name;
-  public string $description;
-  public int | null $price;
-  public int | null $quantity = 1;
-  public int $seller_id;
-  public int $category_id;
-  public string $image = "";
+  private string | null $name;
+  private string | null $description;
+  private int | null $price;
+  private int | null $quantity = 1;
+  private int $seller_id;
+  private int | null $category_id;
+  private string $image = "";
   private array $image_info;
+  private bool $delete_image;
 
   public function __construct(array $post, array $files, int $seller_id)
   {
-    $is_price_valid = isset($post["price"]) && is_numeric($post["price"]);
-    $is_quantity_valid = isset($post["quantity"]) && is_numeric($post["quantity"]);
+    foreach (self::DB_COLUMNS as $name => $value) {
+      if (!$value["from_post"])
+        continue;
+      if (!array_key_exists($name, $post)) {
+        $this->{$name} = null;
+        continue;
+      }
+      $value = $post[$name];
+      $this->{$name} = (is_numeric($value)) ? (int)$value : $value;
+    }
 
-    $this->name = $post["name"] ?? null;
-    $this->description = $post["description"] ?? null;
-    $this->price = ($is_price_valid) ? (int)$post["price"] : null;
-    $this->quantity = ($is_quantity_valid) ? (int)$post["quantity"] : null;
-    $this->category_id = (int)$post["category"];
-    $this->image_info = $files["image"];
     $this->seller_id = $seller_id;
+    $this->image_info = $files["image"];
+    $this->delete_image = $post["delete_image"] ?? false;
   }
 
   private function validate_post_data(): string | int
@@ -91,10 +139,15 @@ class Product extends Model
     return 1;
   }
 
+  private function setDefaultImage(): void
+  {
+    $this->image = self::DEFAULT_IMAGE;
+  }
+
   private function saveImage(): void
   {
     if ($this->image_info["error"] === 4) {
-      $this->image = "_default.jpg";
+      $this->setDefaultImage();
       return;
     }
     $extension = pathinfo($this->image_info["name"], PATHINFO_EXTENSION);
@@ -108,5 +161,23 @@ class Product extends Model
   {
     $this->saveImage();
     Application::$instance->database->addProduct($this);
+  }
+
+  public function updateFrom(array $old_product)
+  {
+    $this->saveImage();
+    $updated_columns = [];
+    foreach (self::DB_COLUMNS as $name => $value) {
+      if (
+        !$value["updatable"]
+        || $this->{$name} == $old_product[$name]
+        || !$this->delete_image && $name === "image"
+      ) continue;
+      $updated_columns[$name] = $this->{$name};
+    }
+    $id = (int)$old_product["id"];
+    return Application::$instance
+      ->database
+      ->updateProduct($id, $updated_columns);
   }
 }

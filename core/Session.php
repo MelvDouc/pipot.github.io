@@ -46,7 +46,7 @@ class Session
       return;
     $user["products"] = Application::$instance
       ->database
-      ->findAll(Product::DB_TABLE, ["*"], ["seller_id" => $user["id"]]);
+      ->findProductsByUserId((int)$user["id"]);
     $this->setUser($user);
   }
 
@@ -60,10 +60,10 @@ class Session
       ->getBasket($id);
   }
 
-  public function isInBasket(int $cart_id): bool
+  public function isInBasket(int $basket_id): bool
   {
     foreach ($this->getUser()["basket"] as $product)
-      if ((int)$product["cart_id"] === $cart_id)
+      if ((int)$product["basket_id"] === $basket_id)
         return true;
     return false;
   }

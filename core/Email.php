@@ -43,14 +43,12 @@ class Email
   public function set_confirmation_HTML_body($verification_string)
   {
     $domain_name = $_ENV["DOMAIN_NAME"];
-    $this->email->Body = "
-    <h1>Bonjour, $this->recipient_username,</h1>
+    $this->email->Body = "<h1>Bonjour, $this->recipient_username,</h1>
 
     <p>Votre inscription a bien été enregistrée. Il ne vous reste plus qu'à cliquer le lien suivant pour activer votre compte.</p>
     <p style='margin-bottom: 2rem;'><a href='$domain_name/validation/$verification_string'>Activer le compte</a></p>
 
-    <div style='text-align: right;'>Bon troc !<br>L'équipe PIPOT</div>
-    ";
+    <div style='text-align: right;'>Bon troc !<br>L'équipe PIPOT</div>";
   }
 
   public function set_confirmation_alt_body($verification_string)
@@ -69,7 +67,7 @@ class Email
     try {
       $this->email->send();
     } catch (Exception $e) {
-      echo "Message could not be sent. Mailer Error: {$this->email->ErrorInfo}";
+      echo "Le message n'a pu être envoyé. Erreur Mailer : {$this->email->ErrorInfo}";
     }
   }
 }
