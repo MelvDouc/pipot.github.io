@@ -55,6 +55,8 @@ $app->get("mes-articles", [ProfileController::class, "my_products"]);
 $app->get("admin", [AdminPanelController::class, "panel"]);
 $app->post("admin-connexion", [AdminController::class, "login"]);
 $app->get("admin-articles", [AdminPanelController::class, "all_products"]);
+$app->get("admin-modifier-article", [AdminProductController::class, "update"]);
+$app->post("admin-modifier-article", [AdminProductController::class, "update"]);
 $app->post("admin-supprimer-article", [AdminProductController::class, "delete"]);
 
 $app->run();

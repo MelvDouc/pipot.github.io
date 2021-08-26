@@ -25,7 +25,7 @@ class AdminController extends Controller
     $validation = $login->validateAdmin();
 
     if ($validation === Login::ERROR_NOT_ADMIN)
-      return $this->redirect("accueil", "home", [
+      return $this->redirect("/accueil", "home", [
         "error_message" => $validation
       ]);
 

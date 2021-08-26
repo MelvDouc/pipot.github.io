@@ -12,7 +12,7 @@ class AuthController extends Controller
   public function login(Request $request)
   {
     if ($this->hasSessionUser())
-      return $this->redirect("/accueil", "home", [
+      return $this->redirectHome([
         "error_message" => "Vous êtes déjà connecté."
       ]);
 
@@ -41,6 +41,6 @@ class AuthController extends Controller
   public function logout()
   {
     Application::$instance->session->removeUser();
-    return $this->redirect("/accueil", "home");
+    return $this->redirectHome();
   }
 }

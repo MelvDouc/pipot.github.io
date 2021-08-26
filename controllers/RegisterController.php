@@ -13,7 +13,7 @@ class RegisterController extends Controller
   public function register(Request $request)
   {
     if (Application::$instance->session->hasUser())
-      return $this->redirect("", "accueil");
+      return $this->redirectHome();
 
     $form = new Form();
     $form->start("/inscription", false, "register-form");
@@ -36,13 +36,13 @@ class RegisterController extends Controller
     if ($validation !== 1)
       return $this->render("registration/index", [
         "form" => $form->createView(),
-        "error" => $validation
+        "error_message" => $validation
       ]);
 
     $user->save();
     $user->send_verification();
 
-    return $this->render("home", [
+    return $this->redirectHome([
       "success_message" => "Nous vous avons envoyé un mail confirmant la création de votre compte. Veuillez suivre le lien donné pour l'activer."
     ]);
   }
@@ -52,10 +52,10 @@ class RegisterController extends Controller
     $verification_string = explode("/", $_SERVER["REQUEST_URI"])[2];
 
     if (!$verification_string)
-      return $this->redirect("/accueil", "home");
+      return $this->redirectHome();
 
     if (!Application::$instance->database->activateAccount($verification_string))
-      return $this->redirect("/accueil", "home");
+      return $this->redirectHome();
     return $this->render("registration/verification");
   }
 }

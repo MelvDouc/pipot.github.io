@@ -67,7 +67,7 @@ class Product extends Model
   private int $seller_id;
   private int | null $category_id;
   private string $image = "";
-  private array $image_info;
+  private array | null $image_info;
   private bool $delete_image;
 
   public function __construct(array $post, array $files, int $seller_id)
@@ -84,7 +84,7 @@ class Product extends Model
     }
 
     $this->seller_id = (int)$seller_id;
-    $this->image_info = $files["image"];
+    $this->image_info = $files["image"] ?? null;
     $this->delete_image = $post["delete_image"] ?? false;
   }
 
@@ -179,17 +179,22 @@ class Product extends Model
     $this->image = self::DEFAULT_IMAGE;
   }
 
+  private function moveImageFile(): void
+  {
+    $extension = pathinfo($this->image_info["name"], PATHINFO_EXTENSION);
+    $image_folder = Application::$ROOT_DIR . "/public/build/img/products";
+    $file_name = md5(time()) . ".$extension";
+    move_uploaded_file($this->image_info["tmp_name"], "$image_folder/$file_name");
+    $this->image = $file_name;
+  }
+
   private function saveImage(): void
   {
     if ($this->image_info["error"] === 4) {
       $this->setDefaultImage();
       return;
     }
-    $extension = pathinfo($this->image_info["name"], PATHINFO_EXTENSION);
-    $image_folder = Application::$ROOT_DIR . "/public/build/img/products";
-    $file_name = md5(time()) . ".$extension";
-    move_uploaded_file($this->image_info["tmp_name"], "$image_folder/$file_name");
-    $this->image = $file_name;
+    $this->moveImageFile();
   }
 
   public function save(): void
@@ -198,18 +203,26 @@ class Product extends Model
     Application::$instance->database->addProduct($this);
   }
 
+  private function updateImage(): void
+  {
+    if ($this->delete_image) {
+      $this->setDefaultImage();
+      return;
+    }
+    if (!$this->image_info["name"])
+      return;
+    $this->moveImageFile();
+  }
+
   public function updateFrom(array $old_product): bool
   {
-    if ((int)$old_product["seller_id"] !== $this->seller_id)
-      return false;
-
-    $this->saveImage();
+    $this->updateImage();
     $updated_columns = [];
     foreach (self::DB_COLUMNS as $name => $value) {
       if (
         !$value["updatable"]
         || $this->{$name} == $old_product[$name]
-        || !$this->delete_image && $name === "image"
+        || $name === "image" && !$this->image
       ) continue;
       $updated_columns[$name] = $this->{$name};
     }
