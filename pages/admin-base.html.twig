@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/build/css/style.css">
+  <script src="/build/js/main.js" type="module" type="text/javascript"></script>
+  <title>PIPOT - {% block title %}Page non trouvée{% endblock %}</title>
+</head>
+<body>
+
+{% include "_partials/header.html.twig" %}
+
+<main>
+  {% block main %}
+  {% endblock %}
+</main>
+  
+{% include "_partials/footer.html.twig" %}
+</body>
+</html>

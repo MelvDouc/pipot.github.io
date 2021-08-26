@@ -9,7 +9,7 @@ use app\core\Model;
 class User extends Model
 {
   public const DB_TABLE = "users";
-  private const USER_ROLES = [
+  public const ROLES = [
     "ADMIN" => 0,
     "USER" => 1
   ];
@@ -27,7 +27,7 @@ class User extends Model
   public string $plain_password;
   public string $confirm_password;
   public bool $agrees_terms;
-  public int $role = self::USER_ROLES["USER"];
+  public int $role = self::ROLES["USER"];
   public string $verification_string;
 
   public function __construct(array $post)

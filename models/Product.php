@@ -83,9 +83,44 @@ class Product extends Model
       $this->{$name} = (is_numeric($value)) ? (int)$value : $value;
     }
 
-    $this->seller_id = $seller_id;
+    $this->seller_id = (int)$seller_id;
     $this->image_info = $files["image"];
     $this->delete_image = $post["delete_image"] ?? false;
+  }
+
+  public function getName(): string | null
+  {
+    return $this->name;
+  }
+
+  public function getDescription(): string | null
+  {
+    return $this->description;
+  }
+
+  public function getPrice(): int | null
+  {
+    return $this->price;
+  }
+
+  public function getQuantity(): int | null
+  {
+    return $this->quantity;
+  }
+
+  public function getSellerId(): int | null
+  {
+    return $this->seller_id;
+  }
+
+  public function getCategoryId(): int | null
+  {
+    return $this->category_id;
+  }
+
+  public function getImage(): string
+  {
+    return $this->image;
   }
 
   private function validate_post_data(): string | int
@@ -163,8 +198,11 @@ class Product extends Model
     Application::$instance->database->addProduct($this);
   }
 
-  public function updateFrom(array $old_product)
+  public function updateFrom(array $old_product): bool
   {
+    if ((int)$old_product["seller_id"] !== $this->seller_id)
+      return false;
+
     $this->saveImage();
     $updated_columns = [];
     foreach (self::DB_COLUMNS as $name => $value) {

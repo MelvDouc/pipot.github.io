@@ -1,5 +1,6 @@
 <?php
 
+use app\admin\AdminController;
 use app\core\Application;
 use app\controllers\AuthController;
 use app\controllers\SiteController;
@@ -8,6 +9,8 @@ use app\controllers\ProductController;
 use app\controllers\ProfileController;
 use app\controllers\CategoryController;
 use app\controllers\RegisterController;
+use app\admin\PanelController as AdminPanelController;
+use app\admin\ProductController as AdminProductController;
 
 require "../vendor/autoload.php";
 
@@ -47,5 +50,11 @@ $app->post("deconnexion", [AuthController::class, "logout"]);
 $app->get("mon-profil", [ProfileController::class, "my_profile"]);
 $app->get("profil", [ProfileController::class, "profile"]);
 $app->get("mes-articles", [ProfileController::class, "my_products"]);
+
+// Admin
+$app->get("admin", [AdminPanelController::class, "panel"]);
+$app->post("admin-connexion", [AdminController::class, "login"]);
+$app->get("admin-articles", [AdminPanelController::class, "all_products"]);
+$app->post("admin-supprimer-article", [AdminProductController::class, "delete"]);
 
 $app->run();

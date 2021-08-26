@@ -2,6 +2,8 @@
 
 namespace app\core;
 
+use app\models\User;
+
 class Controller
 {
   public function render(string $page, array $params = []): void
@@ -35,5 +37,24 @@ class Controller
   protected function getSessionUser(): array | false
   {
     return Application::$instance->session->getUser();
+  }
+
+  protected function isLoggedAsUser(): bool
+  {
+    return $this->hasSessionUser()
+      && (int)$this->getSessionUser()["role"] === User::ROLES["USER"];
+  }
+
+  protected function isLoggedAsAdmin(): bool
+  {
+    return $this->hasSessionUser()
+      && (int)$this->getSessionUser()["role"] === User::ROLES["ADMIN"];
+  }
+
+  protected function findProductById(int $id): array | false
+  {
+    return Application::$instance
+      ->database
+      ->findProductById($id);
   }
 }

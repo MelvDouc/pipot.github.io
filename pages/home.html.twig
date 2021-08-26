@@ -9,9 +9,7 @@
     <div class="success_message">{{ success_message }}</div>
   {% endif %}
 
-  {% if error_message is defined %}
-    <div class="error_message">{{ error_message }}</div>
-  {% endif %}
+  {% include "_partials/error_message.html.twig" %}
 
   <div class="content">
   <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorum maxime sapiente, facilis voluptatem laboriosam quas facere eaque deleniti quam aliquam nesciunt ad rerum in consequatur laudantium hic magnam distinctio error.</p>

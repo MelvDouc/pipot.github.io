@@ -11,8 +11,6 @@
 
     <p>Pas encore de compte ? <a href="/inscription">S'inscrire</a></p>
 
-    {% if error_message is defined %}
-      <div class="error_message">{{ error_message }}</div>
-    {% endif %}
+    {% include "_partials/error_message.html.twig" %}
   </div>
 {% endblock %}

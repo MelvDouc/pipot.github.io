@@ -39,6 +39,54 @@ class Database
     }
   }
 
+  // ===== ===== ===== ===== =====
+  // General
+  // ===== ===== ===== ===== =====
+
+  public function valueExists(string $table, string $column, string | int $value): bool
+  {
+    if (gettype($value) === "string")
+      $value = "'" . $value . "'";
+    $sql = "SELECT * FROM $table WHERE $column = $value;";
+    return (bool)($this->db->query($sql)->fetch());
+  }
+
+  private function formatSearchQuery(string $table, array $columns = ["*"], array $where = [], string $connector = "AND"): string
+  {
+    $columns = implode(",", $columns);
+    $sql = "SELECT $columns FROM $table";
+
+    if (!$where) return $sql;
+    $sql .= " WHERE ";
+
+    $search = [];
+    foreach ($where as $column => $value) {
+      if (is_string($value))
+        $value = "'" . $value . "'";
+      $search[] = "$column = $value";
+    }
+    $search = implode(" $connector ", $search);
+    $sql .= $search;
+
+    return $sql;
+  }
+
+  public function findOne(string $table, array $columns = ["*"], array $where = [], string $connector = "AND"): array | false
+  {
+    $sql = $this->formatSearchQuery($table, $columns, $where, $connector);
+    return $this->db->query($sql)->fetch();
+  }
+
+  public function findAll(string $table, array $columns = ["*"], array $where = [], string $connector = "AND"): array | false
+  {
+    $sql = $this->formatSearchQuery($table, $columns, $where, $connector);
+    return $this->db->query($sql)->fetchAll();
+  }
+
+  // ===== ===== ===== ===== =====
+  // User
+  // ===== ===== ===== ===== =====
+
   public function addUser(User $user): bool
   {
     $hashedPassword = password_hash($user->plain_password, PASSWORD_DEFAULT);
@@ -53,18 +101,30 @@ class Database
     return $statement->execute();
   }
 
+  public function activateAccount(string $verification_string): bool
+  {
+    $sql = "UPDATE users SET is_account_active = 1, verification_string = '' WHERE verification_string = ?;";
+    $statement = $this->db->prepare($sql);
+    $statement->bindParam(1, $verification_string, \PDO::PARAM_STR);
+    return $statement->execute();
+  }
+
+  // ===== ===== ===== ===== =====
+  // Product
+  // ===== ===== ===== ===== =====
+
   public function addProduct(Product $product): bool
   {
     $sql = "INSERT INTO products (name, description, price, quantity, seller_id, category_id, image, creation_date)
      VALUES (:name, :description, :price, :quantity, :seller_id, :category_id, :image, NOW());";
     $statement = $this->db->prepare($sql);
-    $statement->bindParam(":name", $product->name, \PDO::PARAM_STR);
-    $statement->bindParam(":description", $product->description, \PDO::PARAM_STR);
-    $statement->bindParam(":price", $product->price, \PDO::PARAM_INT);
-    $statement->bindParam(":quantity", $product->quantity, \PDO::PARAM_INT);
-    $statement->bindParam(":seller_id", $product->seller_id, \PDO::PARAM_INT);
-    $statement->bindParam(":category_id", $product->category_id, \PDO::PARAM_INT);
-    $statement->bindParam(":image", $product->image, \PDO::PARAM_STR);
+    $statement->bindParam(":name", $product->getName(), \PDO::PARAM_STR);
+    $statement->bindParam(":description", $product->getDescription(), \PDO::PARAM_STR);
+    $statement->bindParam(":price", $product->getPrice(), \PDO::PARAM_INT);
+    $statement->bindParam(":quantity", $product->getQuantity(), \PDO::PARAM_INT);
+    $statement->bindParam(":seller_id", $product->getSellerId(), \PDO::PARAM_INT);
+    $statement->bindParam(":category_id", $product->getCategoryId(), \PDO::PARAM_INT);
+    $statement->bindParam(":image", $product->getImage(), \PDO::PARAM_STR);
     return $statement->execute();
   }
 
@@ -84,6 +144,73 @@ class Database
     }
     return $statement->execute();
   }
+
+  public function deleteProduct(int $id): bool
+  {
+    $sql = "DELETE FROM products WHERE id = ?";
+    $statement = $this->db->prepare($sql);
+    $statement->bindParam(1, $id, \PDO::PARAM_INT);
+    return $statement->execute();
+  }
+
+  public function findProductById(int $id): array | false
+  {
+    $sql = "SELECT
+    products.id AS id, products.name, products.description, products.price,
+    products.quantity, products.seller_id, users.username AS seller, products.category_id,
+    products.image, categories.name AS category, products.creation_date
+    FROM `products`
+    JOIN users ON seller_id = users.id
+    JOIN categories ON category_id = categories.id
+    WHERE products.id = $id
+    ORDER BY creation_date DESC;";
+    return $this->db->query($sql)->fetch();
+  }
+
+  public function findAllProducts(): array | false
+  {
+    $sql = "SELECT products.id, products.name, products.description, price, quantity, seller_id,
+    users.username AS seller, category_id, categories.name AS category, image, products.creation_date
+    FROM products
+    JOIN users ON users.id = seller_id
+    JOIN categories ON categories.id = category_id
+    ORDER BY products.id";
+    return $this->db->query($sql)->fetchAll();
+  }
+
+  public function findProductsByUserId(int $id): array | false
+  {
+    $sql = "SELECT
+    products.id, products.name, products.description, price, quantity, seller_id,
+    category_id, categories.name AS category, image, products.creation_date
+    FROM `products`
+    JOIN categories ON category_id = categories.id
+    WHERE seller_id = $id;";
+    return $this->db->query($sql)->fetchAll();
+  }
+
+  public function findCategoryProducts(int $category_id): array | false
+  {
+    $sql = "SELECT
+    products.id AS id,
+    products.name AS name,
+    description,
+    price,
+    quantity,
+    seller_id,
+    users.username AS seller,
+    image,
+    creation_date
+    FROM products
+    JOIN users ON users.id = seller_id
+    WHERE category_id = $category_id
+    ORDER BY creation_date DESC;";
+    return $this->db->query($sql)->fetchAll();
+  }
+
+  // ===== ===== ===== ===== =====
+  // Basket
+  // ===== ===== ===== ===== =====
 
   public function getBasket(int $user_id): array | false
   {
@@ -118,99 +245,6 @@ class Database
   {
     $sql = "DELETE FROM basket WHERE id = $basket_id;";
     $statement = $this->db->prepare($sql);
-    return $statement->execute();
-  }
-
-  private function formatSearchQuery(string $table, array $columns = ["*"], array $where = [], string $connector = "AND"): string
-  {
-    $columns = implode(",", $columns);
-    $sql = "SELECT $columns FROM $table";
-
-    if (!$where)
-      return $sql;
-
-    $sql .= " WHERE ";
-
-    $search = [];
-    foreach ($where as $column => $value) {
-      if (is_string($value))
-        $value = "'" . $value . "'";
-      $search[] = "$column = $value";
-    }
-    $search = implode(" $connector ", $search);
-    $sql .= $search;
-
-    return $sql;
-  }
-
-  public function findOne(string $table, array $columns = ["*"], array $where = [], string $connector = "AND"): array | false
-  {
-    $sql = $this->formatSearchQuery($table, $columns, $where, $connector);
-    return $this->db->query($sql)->fetch();
-  }
-
-  public function findAll(string $table, array $columns = ["*"], array $where = [], string $connector = "AND"): array | false
-  {
-    $sql = $this->formatSearchQuery($table, $columns, $where, $connector);
-    return $this->db->query($sql)->fetchAll();
-  }
-
-  public function findProductById(int $id): array | false
-  {
-    $sql = "SELECT
-    products.id AS id, products.name, products.description, products.price,
-    products.quantity, products.seller_id, users.username AS seller, products.category_id,
-    products.image, categories.name AS category, products.creation_date
-    FROM `products`
-    JOIN users ON seller_id = users.id
-    JOIN categories ON category_id = categories.id
-    WHERE products.id = $id;";
-    return $this->db->query($sql)->fetch();
-  }
-
-  public function findProductsByUserId(int $id): array | false
-  {
-    $sql = "SELECT
-    products.id, products.name, products.description, price, quantity, seller_id,
-    category_id, categories.name AS category, image, products.creation_date
-    FROM `products`
-    JOIN categories ON category_id = categories.id
-    WHERE seller_id = $id;";
-    return $this->db->query($sql)->fetchAll();
-  }
-
-  public function findCategoryProducts(int $category_id): array | false
-  {
-    $sql = "SELECT
-    products.id AS id,
-    products.name AS name,
-    description,
-    price,
-    quantity,
-    seller_id,
-    users.username AS seller,
-    image,
-    creation_date
-    FROM products
-    JOIN users ON users.id = seller_id
-    WHERE category_id = $category_id
-    ORDER BY creation_date DESC;";
-    return $this->db->query($sql)->fetchAll();
-  }
-
-  public function valueExists(string $table, string $column, string | int $value): bool
-  {
-    if (gettype($value) === "string")
-      $value = "'" . $value . "'";
-    $sql = "SELECT * FROM $table WHERE $column = $value;";
-    return (bool)($this->db->query($sql)->fetch());
-  }
-
-  public function activateAccount(string $verification_string): bool
-  {
-    $sql = "UPDATE users SET is_account_active = 1, verification_string = '' WHERE verification_string = ?;";
-    $statement = $this->db->prepare($sql);
-    $statement->bindParam(1, $verification_string, \PDO::PARAM_STR);
     return $statement->execute();
   }
 }
