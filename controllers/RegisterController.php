@@ -5,7 +5,7 @@ namespace app\controllers;
 use app\core\Controller;
 use app\core\Application;
 use app\core\Request;
-use app\models\Form;
+use app\models\forms\RegisterForm;
 use app\models\User;
 
 class RegisterController extends Controller
@@ -15,22 +15,14 @@ class RegisterController extends Controller
     if (Application::$instance->session->hasUser())
       return $this->redirectHome();
 
-    $form = new Form();
-    $form->start("/inscription", false, "register-form");
-    $form->add_input("Nom d'utilisateur", "username", "text");
-    $form->add_input("Adresse email", "email");
-    $form->add_input("Mot de passe", "password");
-    $form->add_input("Confirmer le mot de passe", "confirm_password", "password");
-    $form->add_checkbox("Accepter les conditions d'utilisation", "agree_terms");
-    $form->add_submit("S'inscrire");
-    $form->end();
+    $form = new RegisterForm();
 
     if ($request->isGet())
       return $this->render("registration/index", [
         "form" => $form->createView()
       ]);
 
-    $user = new User($_POST);
+    $user = new User($request->getBody());
     $validation = $user->validate();
 
     if ($validation !== 1)

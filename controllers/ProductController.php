@@ -6,6 +6,8 @@ use app\core\Request;
 use app\models\Product;
 use app\core\Controller;
 use app\core\Application;
+use app\models\forms\AddProductForm;
+use app\models\forms\UpdateProductForm;
 
 class ProductController extends Controller
 {
@@ -52,7 +54,7 @@ class ProductController extends Controller
     if (!$user)
       return $this->redirectToLogin();
 
-    $form = $this->getAddForm();
+    $form = new AddProductForm();
 
     if ($request->isGet())
       return $this->render("products/add", [
@@ -91,7 +93,7 @@ class ProductController extends Controller
     if (!$this->isLoggedAsAdmin() && !$is_user_product)
       return $this->redirectNotFound();
 
-    $form = $this->getUpdateForm("/modifier-article/$id", $product);
+    $form = new UpdateProductForm("/modifier-article/$id", $product);
     $params = [
       "form" => $form->createView(),
       "product_name" => $product["name"],

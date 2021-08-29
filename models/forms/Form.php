@@ -1,6 +1,8 @@
 <?php
 
-namespace app\models;
+namespace app\models\forms;
+
+use app\core\Application;
 
 class Form
 {
@@ -85,5 +87,16 @@ class Form
       $view .= $field;
     $view .= $this->closing_tag;
     return $view;
+  }
+
+  protected function getCategoryOptions(): array
+  {
+    $categories = Application::$instance
+      ->database
+      ->findAll("categories", ["id", "name"]);
+    $category_options = [];
+    foreach ($categories as $category)
+      $category_options[$category["id"]] = ucfirst($category["name"]);
+    return $category_options;
   }
 }

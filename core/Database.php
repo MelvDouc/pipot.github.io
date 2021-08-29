@@ -109,6 +109,30 @@ class Database
     return $statement->execute();
   }
 
+  public function updatePassword(int $user_id, string $hashed_password): bool
+  {
+    $sql = "UPDATE users SET password = ? WHERE id = $user_id;";
+    $statement = $this->db->prepare($sql);
+    $statement->bindParam(1, $hashed_password, \PDO::PARAM_STR);
+    return $statement->execute();
+  }
+
+  public function updateContact(int $user_id, array $updated_columns): bool
+  {
+    if (!$updated_columns)
+      return true;
+    $column_names = implode(", ", array_keys($updated_columns));
+    $values = preg_replace("/(\w+)/", "$1 = ?", $column_names);
+    $sql = "UPDATE users SET $values WHERE id = $user_id;";
+    $statement = $this->db->prepare($sql);
+    $i = 1;
+    foreach ($updated_columns as $key => &$value) {
+      $statement->bindParam($i, $value, \PDO::PARAM_STR);
+      $i++;
+    }
+    return $statement->execute();
+  }
+
   // ===== ===== ===== ===== =====
   // Product
   // ===== ===== ===== ===== =====

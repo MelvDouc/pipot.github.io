@@ -3,6 +3,7 @@
 namespace app\core;
 
 use app\models\Product;
+use app\models\User;
 
 class Session
 {
@@ -27,6 +28,14 @@ class Session
     $_SESSION["user"] = $user;
 
     return $this;
+  }
+
+  public function updateUser(): void
+  {
+    $user = Application::$instance
+      ->database
+      ->findOne(User::DB_TABLE, ["*"], ["id" => $this->getUser()["id"]]);
+    $this->setUser($user);
   }
 
   public function hasUser(): bool

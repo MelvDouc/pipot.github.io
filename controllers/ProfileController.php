@@ -6,6 +6,9 @@ use app\models\User;
 use app\core\Controller;
 use app\core\Application;
 use app\core\Request;
+use app\models\forms\Form;
+use app\models\forms\updateContactForm;
+use app\models\forms\UpdatePasswordForm;
 
 class ProfileController extends Controller
 {
@@ -52,6 +55,79 @@ class ProfileController extends Controller
       "user" => $user,
       "isUserProfile" => true
     ]);
+  }
+
+  public function updatePassword(Request $request)
+  {
+    if (!$this->hasSessionUser())
+      return $this->redirectToLogin();
+
+    $user = $this->getSessionUser();
+    $id = (int)$user["id"];
+    $form = new UpdatePasswordForm($user);
+
+    if ($request->isGet())
+      return $this->render("user/update-password", [
+        "form" => $form->createView()
+      ]);
+
+    $form->setBody($request->getBody());
+    $validation = $form->validate();
+
+    if ($validation !== 1)
+      return $this->render("user/update-password", [
+        "form" => $form->createView(),
+        "error_message" => $validation
+      ]);
+
+    if (!Application::$instance
+      ->database
+      ->updatePassword($id, $form->getHashedPassword()))
+      return $this->render("/user-update-password", [
+        "form" => $form->createView(),
+        "error_message" => "Une erreur s'est produite lors de la mise à jour du mot de passe."
+      ]);
+
+    Application::$instance->session->updateUser();
+    return $this->redirect("/mon-profil", "user/profile", [
+      "success_message" => "Votre mot de passe a bien été modifié."
+    ]);
+  }
+
+  public function updateContact(Request $request)
+  {
+    if (!$this->hasSessionUser())
+      return $this->redirectToLogin();
+
+    $user = $this->getSessionUser();
+    $id = (int)$user["id"];
+    $form = new updateContactForm($this->getSessionUser());
+
+    if ($request->isGet())
+      return $this->render("user/update-contact", [
+        "form" => $form->createView()
+      ]);
+
+    $form->setBody($request->getBody());
+    $validation = $form->validate();
+
+    if ($validation !== 1)
+      return $this->render("user/update-contact", [
+        "form" => $form->createView(),
+        "error_message" => $validation
+      ]);
+
+    if (!Application::$instance
+      ->database
+      ->updateContact($id, $form->getBody()))
+      return $this->render("user/update-contact", [
+        "form" => $form->createView(),
+        "error-message" => "Une erreur s'est produite lors de la mise à jour des coordonnées."
+      ]);
+    Application::$instance
+      ->session
+      ->updateUser();
+    return $this->redirect("/mon-profil", "user/profile");
   }
 
   public function my_products()

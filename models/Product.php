@@ -5,51 +5,21 @@ namespace app\models;
 use app\core\Application;
 use app\core\Model;
 
+define("PRODUCT_DB_COLUMNS", [
+  "name" => Model::DbColumn(true, "string", true),
+  "description" => Model::DbColumn(true, "string", true),
+  "price" => Model::DbColumn(true, "integer", true),
+  "quantity" => Model::DbColumn(true, "integer", true),
+  "seller_id" => Model::DbColumn(false, "integer", false),
+  "category_id" => Model::DbColumn(true, "integer", true),
+  "image" => Model::DbColumn(true, "string", false),
+  "creation_date" => Model::DbColumn(false, "string", false)
+]);
+
 class Product extends Model
 {
   public const DB_TABLE = "products";
-  public const DB_COLUMNS = [
-    "name" => [
-      "updatable" => true,
-      "type" => "string",
-      "from_post" => true
-    ],
-    "description" => [
-      "updatable" => true,
-      "type" => "string",
-      "from_post" => true
-    ],
-    "price" => [
-      "updatable" => true,
-      "type" => "integer",
-      "from_post" => true
-    ],
-    "quantity" => [
-      "updatable" => true,
-      "type" => "integer",
-      "from_post" => true
-    ],
-    "seller_id" => [
-      "updatable" => false,
-      "type" => "integer",
-      "from_post" => false
-    ],
-    "category_id" => [
-      "updatable" => true,
-      "type" => "integer",
-      "from_post" => true
-    ],
-    "image" => [
-      "updatable" => true,
-      "type" => "string",
-      "from_post" => false
-    ],
-    "creation_date" => [
-      "updatable" => false,
-      "type" => "string",
-      "from_post" => false
-    ],
-  ];
+  public const DB_COLUMNS = PRODUCT_DB_COLUMNS;
   public const NAME_MAX_LENGTH = 50;
   public const DEFAULT_IMAGE = "_default.jpg";
   public const VALID_IMAGE_TYPES = ["image/jpeg", "image/png", "image/jpeg", "image/gif"];

@@ -3,7 +3,7 @@
 namespace app\models;
 
 use app\core\Model;
-use app\models\Form;
+use app\models\forms\Form;
 use app\core\Application;
 
 class Login extends Model
@@ -15,10 +15,10 @@ class Login extends Model
   private string $password;
   private array | false $user;
 
-  public function __construct(array $post)
+  public function __construct(array $body)
   {
-    $this->uuid = $post["uuid"] ?? null;
-    $this->password = $post["password"] ?? null;
+    $this->uuid = $body["uuid"] ?? null;
+    $this->password = $body["password"] ?? null;
   }
 
   public static function getForm(string $action): Form

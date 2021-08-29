@@ -46,9 +46,13 @@ $app->get("connexion", [AuthController::class, "login"]);
 $app->post("connexion", [AuthController::class, "login"]);
 $app->post("deconnexion", [AuthController::class, "logout"]);
 
-// Profil
+// Profil²
 $app->get("mon-profil", [ProfileController::class, "my_profile"]);
 $app->get("profil", [ProfileController::class, "profile"]);
+$app->get("modifier-mon-mot-de-passe", [ProfileController::class, "updatePassword"]);
+$app->post("modifier-mon-mot-de-passe", [ProfileController::class, "updatePassword"]);
+$app->get("modifier-mes-coordonnees", [ProfileController::class, "updateContact"]);
+$app->post("modifier-mes-coordonnees", [ProfileController::class, "updateContact"]);
 $app->get("mes-articles", [ProfileController::class, "my_products"]);
 
 // Admin

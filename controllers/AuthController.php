@@ -23,7 +23,7 @@ class AuthController extends Controller
         "form" => $form->createView()
       ]);
 
-    $login = new Login($_POST);
+    $login = new Login($request->getBody());
     $validation = $login->validate();
 
     if ($validation !== 1)

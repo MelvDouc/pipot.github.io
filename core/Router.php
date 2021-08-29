@@ -49,14 +49,13 @@ class Router
     call_user_func($callback, $this->request);
   }
 
-  public function renderView(string $view, array $params = []): void
+  public function renderView(string $view, array $params = [])
   {
     $loader = new \Twig\Loader\FilesystemLoader(Application::$ROOT_DIR  . "/pages");
     $twig = new \Twig\Environment($loader);
     $twig->addExtension(new StringExtension());
 
     $params["is_user_logged_in"] = Application::$instance->session->hasUser();
-
     echo $twig->render("$view.html.twig", $params);
   }
 }

@@ -12,5 +12,20 @@
 
   <div class="content">
 
+    {% include "_partials/success_message.html.twig" %}
+
+    <div class="profile-card">
+      <a href="/modifier-mon-mot-de-passe">Modifier mon mot de passe</a>
+      <a href="/modifier-mes-coordonnees">Modifier le profil</a>
+    </div>
+
+    <ul>
+      <li>{{ user.username }}</li>
+      <li>{{ user.postal_address }}</li>
+      <li>{{ user.city }}</li>
+      <li>{{ user.zip_code }}</li>
+      <li>{{ user.phone_number }}</li>
+      <li>Membre depuis le {{ user.register_date | date('d-m-Y') }}</li>
+    </ul>
   </div>
 {% endblock %}
