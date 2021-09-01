@@ -5,8 +5,8 @@ namespace app\controllers;
 use app\core\Controller;
 use app\core\Application;
 use app\core\Request;
-use app\models\forms\RegisterForm;
 use app\models\User;
+use app\models\forms\users\RegisterForm;
 
 class RegisterController extends Controller
 {

@@ -1,8 +1,9 @@
 <?php
 
-namespace app\models\forms;
+namespace app\models\forms\products;
 
 use app\models\Product;
+use app\models\forms\Form;
 
 class AddProductForm extends Form
 {

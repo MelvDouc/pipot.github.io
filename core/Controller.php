@@ -2,9 +2,7 @@
 
 namespace app\core;
 
-use app\models\forms\Form;
 use app\models\User;
-use app\models\Product;
 
 class Controller
 {
@@ -36,12 +34,12 @@ class Controller
     return $this->render("404", $params);
   }
 
-  protected function hasSessionUser(): bool
+  private function hasSessionUser(): bool
   {
     return Application::$instance->session->hasUser();
   }
 
-  protected function getSessionUser(): array | false
+  protected function getSessionUser(): ?array
   {
     return Application::$instance->session->getUser();
   }
@@ -58,7 +56,14 @@ class Controller
       && (int)$this->getSessionUser()["role"] === User::ROLES["ADMIN"];
   }
 
-  protected function findProductById(int $id): array | false
+  protected function findUserById(int $id): ?array
+  {
+    return Application::$instance
+      ->database
+      ->findOne(User::DB_TABLE, ["*"]);
+  }
+
+  protected function findProductById(int $id): ?array
   {
     return Application::$instance
       ->database

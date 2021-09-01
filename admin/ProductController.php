@@ -5,6 +5,7 @@ namespace app\admin;
 use app\core\Request;
 use app\models\Product;
 use app\core\Application;
+use app\models\forms\products\UpdateProductForm;
 
 class ProductController extends AdminController
 {
@@ -19,7 +20,7 @@ class ProductController extends AdminController
     $product = $this->findProductById($id);
     if (!$product) return $this->redirectNotFound();
 
-    $form = $this->getUpdateForm("/admin-modifier-article/$id", $product);
+    $form = new UpdateProductForm("/admin-modifier-article/$id", $product);
     $params = [
       "form" => $form->createView(),
       "product_name" => $product["name"],

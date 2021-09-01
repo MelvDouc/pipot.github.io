@@ -6,18 +6,16 @@ use app\models\User;
 use app\core\Controller;
 use app\core\Application;
 use app\core\Request;
-use app\models\forms\Form;
-use app\models\forms\updateContactForm;
-use app\models\forms\UpdatePasswordForm;
+use app\models\forms\users\updateContactForm;
+use app\models\forms\users\UpdatePasswordForm;
 
 class ProfileController extends Controller
 {
   private function isUserProfile(int $param_id): bool
   {
-    if (!$this->hasSessionUser())
+    if (!($user = $this->getSessionUser()))
       return false;
-    $sessionUser = $this->getSessionUser();
-    $sessionId = (int)$sessionUser["id"];
+    $sessionId = (int)$user["id"];
     return $param_id === $sessionId;
   }
 
@@ -25,17 +23,15 @@ class ProfileController extends Controller
   {
     return Application::$instance
       ->database
-      ->findOne(User::DB_TABLE, ["*"], ["id" => $param_id]);
+      ->findUserAndRatingById($param_id);
   }
 
   public function profile(Request $request)
   {
-    $id = $request->getParamId();
-    if (!$id)
+    if (!($id = $request->getParamId()))
       return $this->redirectNotFound();
 
-    $user = $this->getParamUser($id);
-    if (!$user)
+    if (!($user = $this->getParamUser($id)))
       return $this->redirectNotFound();
 
     return $this->render("user/profile", [
@@ -46,10 +42,10 @@ class ProfileController extends Controller
 
   public function my_profile()
   {
-    if (!$this->hasSessionUser())
+    if (!($sessionUser = $this->getSessionUser()))
       return $this->redirectToLogin();
 
-    $user = $this->getSessionUser();
+    $user = $this->getParamUser((int)$sessionUser["id"]);
 
     return $this->render("user/profile", [
       "user" => $user,
@@ -59,10 +55,9 @@ class ProfileController extends Controller
 
   public function updatePassword(Request $request)
   {
-    if (!$this->hasSessionUser())
+    if (!($user = $this->getSessionUser()))
       return $this->redirectToLogin();
 
-    $user = $this->getSessionUser();
     $id = (int)$user["id"];
     $form = new UpdatePasswordForm($user);
 
@@ -96,10 +91,9 @@ class ProfileController extends Controller
 
   public function updateContact(Request $request)
   {
-    if (!$this->hasSessionUser())
+    if (!($user = $this->getSessionUser()))
       return $this->redirectToLogin();
 
-    $user = $this->getSessionUser();
     $id = (int)$user["id"];
     $form = new updateContactForm($this->getSessionUser());
 
@@ -132,11 +126,12 @@ class ProfileController extends Controller
 
   public function my_products()
   {
-    if (!$this->hasSessionUser())
+    if (!($user = $this->getSessionUser()))
       return $this->redirectToLogin();
 
-    Application::$instance->session->updateProducts();
-    $user = $this->getSessionUser();
+    $user["products"] = Application::$instance
+      ->database
+      ->findProductsByUserId((int) $user["id"]);
 
     return $this->render("user/my-products", [
       "user" => $user,

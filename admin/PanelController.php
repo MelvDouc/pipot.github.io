@@ -4,7 +4,7 @@ namespace app\admin;
 
 use app\core\Application;
 use app\core\Request;
-use app\models\Product;
+use app\models\User;
 
 class PanelController extends AdminController
 {
@@ -27,6 +27,20 @@ class PanelController extends AdminController
 
     return $this->render("admin/all-products", [
       "products" => $products
+    ]);
+  }
+
+  public function all_users(Request $request)
+  {
+    if (!$this->isLoggedAsAdmin())
+      return $this->login($request);
+
+    $users = Application::$instance
+      ->database
+      ->findAll(User::DB_TABLE, ["*"]);
+
+    return $this->render("admin/all-users", [
+      "users" => $users
     ]);
   }
 }

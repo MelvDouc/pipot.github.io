@@ -10,13 +10,8 @@
 
   <div class="content">
   
-    {% if error_message is defined %}
-      <div class="error_message">{{ error_message }}</div>
-    {% endif %}
-
-    {% if success_message is defined %}
-      <div class="success_message">{{ success_message }}</div>
-    {% endif %}
+    {% include "_partials/error_message.html.twig" %}
+    {% include "_partials/success_message.html.twig" %}
 
     {% if user.basket is empty %}
       <p>Votre panier est vide. Vous pouvez jeter un oeil à la <a href="/categories">page des catégories</a> et ajouter les articles qui vous intéressent.</p>

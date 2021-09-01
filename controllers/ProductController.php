@@ -6,17 +6,17 @@ use app\core\Request;
 use app\models\Product;
 use app\core\Controller;
 use app\core\Application;
-use app\models\forms\AddProductForm;
-use app\models\forms\UpdateProductForm;
+use app\models\forms\products\AddProductForm;
+use app\models\forms\products\UpdateProductForm;
 
 class ProductController extends Controller
 {
   private function canBeAddedToBasket(array $product): bool
   {
-    if (!$this->hasSessionUser())
+    if (!($user = $this->getSessionUser()))
       return false;
 
-    $user_id = (int)$this->getSessionUser()["id"];
+    $user_id = (int)$user["id"];
     if ((int)$product["seller_id"] === $user_id)
       return false;
 
@@ -61,7 +61,8 @@ class ProductController extends Controller
         "form" => $form->createView(),
       ]);
 
-    $product = new Product($_POST, $_FILES, (int)$user["id"]);
+
+    $product = new Product($request->getBody(), (int)$user["id"]);
     $validation = $product->validate();
 
     if ($validation !== 1)
@@ -70,8 +71,8 @@ class ProductController extends Controller
         "error_message" => $validation
       ]);
 
-    $product->save();
-    Application::$instance->session->updateProducts();
+    if (!$product->save())
+      return $this->render("products/add");
     return $this->redirect("/mes-articles", "user/my-products", [
       "user" => $user
     ]);
@@ -103,7 +104,7 @@ class ProductController extends Controller
     if ($request->isGet())
       return $this->render("products/update", $params);
 
-    $updated_product = new Product($_POST, $_FILES, $user_id);
+    $updated_product = new Product($request->getBody(), $user_id);
     $validation = $updated_product->validate();
 
     if ($validation !== 1) {
@@ -116,7 +117,6 @@ class ProductController extends Controller
       return $this->render("products/update", $params);
     }
 
-    Application::$instance->session->updateProducts();
     return $this->redirect("/mes-articles", "user/my-products", [
       "user" => $user
     ]);
@@ -144,13 +144,12 @@ class ProductController extends Controller
     $deletion = Application::$instance
       ->database
       ->deleteProduct($product_id);
-    Application::$instance->session->updateProducts();
 
     if (!$deletion)
-      return $this->render("user/my-basket", [
+      return $this->render("user/my-products", [
         "error_message" => "La suppression du produit a échoué."
       ]);
 
-    return $this->render("user/my-basket");
+    return $this->render("user/my-products");
   }
 }

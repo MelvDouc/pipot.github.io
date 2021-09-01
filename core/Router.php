@@ -54,8 +54,9 @@ class Router
     $loader = new \Twig\Loader\FilesystemLoader(Application::$ROOT_DIR  . "/pages");
     $twig = new \Twig\Environment($loader);
     $twig->addExtension(new StringExtension());
+    $appUser = Application::$instance->session->getUser();
+    $twig->addGlobal("appUser", $appUser);
 
-    $params["is_user_logged_in"] = Application::$instance->session->hasUser();
     echo $twig->render("$view.html.twig", $params);
   }
 }

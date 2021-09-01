@@ -30,31 +30,31 @@ class Product extends Model
   public const ERROR_INVALID_FILE_TYPE = "L'image doit être au format jpeg, png ou gif.";
   public const ERROR_FILE_TOO_LARGE = "Le fichier image ne doit pas faire plus de 2 MO.";
   public const ERROR_NO_CATEGORY = "Catégorie non trouvée.";
-  private string | null $name;
-  private string | null $description;
-  private int | null $price;
-  private int | null $quantity = 1;
-  private int $seller_id;
-  private int | null $category_id;
-  private string $image = "";
-  private array | null $image_info;
+  private ?string $name;
+  private ?string $description;
+  private ?int $price;
+  private ?int $quantity = 1;
+  private ?int $category_id;
+  private ?array $files = [];
   private bool $delete_image;
+  private int $seller_id;
+  private ?string $image = null;
 
-  public function __construct(array $post, array $files, int $seller_id)
+  public function __construct(array $body, int $seller_id)
   {
     foreach (self::DB_COLUMNS as $name => $value) {
       if (!$value["from_post"])
         continue;
-      if (!array_key_exists($name, $post)) {
+      if (!array_key_exists($name, $body)) {
         $this->{$name} = null;
         continue;
       }
-      $value = $post[$name];
+      $value = $body[$name];
       $this->{$name} = (is_numeric($value)) ? (int)$value : $value;
     }
 
+    $this->files = $body["files"] ?? null;
     $this->seller_id = (int)$seller_id;
-    $this->image_info = $files["image"] ?? null;
     $this->delete_image = $post["delete_image"] ?? false;
   }
 
@@ -108,7 +108,10 @@ class Product extends Model
 
   private function validate_file_data(): string | int
   {
-    extract($this->image_info);
+    if (!$this->files) return 1;
+
+    extract($this->files["image"]);
+
     if ($error === 4)
       return 1;
     if (!in_array($type, self::VALID_IMAGE_TYPES))
@@ -151,26 +154,26 @@ class Product extends Model
 
   private function moveImageFile(): void
   {
-    $extension = pathinfo($this->image_info["name"], PATHINFO_EXTENSION);
+    $extension = pathinfo($this->files["image"]["name"], PATHINFO_EXTENSION);
     $image_folder = Application::$ROOT_DIR . "/public/build/img/products";
     $file_name = md5(time()) . ".$extension";
-    move_uploaded_file($this->image_info["tmp_name"], "$image_folder/$file_name");
+    move_uploaded_file($this->files["image"]["tmp_name"], "$image_folder/$file_name");
     $this->image = $file_name;
   }
 
   private function saveImage(): void
   {
-    if ($this->image_info["error"] === 4) {
+    if ($this->files["image"]["error"] === 4) {
       $this->setDefaultImage();
       return;
     }
     $this->moveImageFile();
   }
 
-  public function save(): void
+  public function save(): bool
   {
     $this->saveImage();
-    Application::$instance->database->addProduct($this);
+    return Application::$instance->database->addProduct($this);
   }
 
   private function updateImage(): void
@@ -179,7 +182,7 @@ class Product extends Model
       $this->setDefaultImage();
       return;
     }
-    if (!$this->image_info["name"])
+    if (!$this->files["image"]["name"])
       return;
     $this->moveImageFile();
   }

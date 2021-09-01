@@ -11,6 +11,8 @@ use app\controllers\CategoryController;
 use app\controllers\RegisterController;
 use app\admin\PanelController as AdminPanelController;
 use app\admin\ProductController as AdminProductController;
+use app\admin\UserController as AdminUserController;
+use app\controllers\MessageController;
 
 require "../vendor/autoload.php";
 
@@ -46,7 +48,7 @@ $app->get("connexion", [AuthController::class, "login"]);
 $app->post("connexion", [AuthController::class, "login"]);
 $app->post("deconnexion", [AuthController::class, "logout"]);
 
-// Profil²
+// Profil
 $app->get("mon-profil", [ProfileController::class, "my_profile"]);
 $app->get("profil", [ProfileController::class, "profile"]);
 $app->get("modifier-mon-mot-de-passe", [ProfileController::class, "updatePassword"]);
@@ -55,12 +57,19 @@ $app->get("modifier-mes-coordonnees", [ProfileController::class, "updateContact"
 $app->post("modifier-mes-coordonnees", [ProfileController::class, "updateContact"]);
 $app->get("mes-articles", [ProfileController::class, "my_products"]);
 
+// Messages
+$app->get("messagerie", [MessageController::class, "my_messages"]);
+$app->post("messagerie", [MessageController::class, "my_messages"]);
+
 // Admin
 $app->get("admin", [AdminPanelController::class, "panel"]);
 $app->post("admin-connexion", [AdminController::class, "login"]);
 $app->get("admin-articles", [AdminPanelController::class, "all_products"]);
+$app->get("admin-utilisateurs", [AdminPanelController::class, "all_users"]);
 $app->get("admin-modifier-article", [AdminProductController::class, "update"]);
 $app->post("admin-modifier-article", [AdminProductController::class, "update"]);
+$app->get("admin-modifier-utilisateur", [AdminUserController::class, "update"]);
+$app->post("admin-modifier-utilisateur", [AdminUserController::class, "update"]);
 $app->post("admin-supprimer-article", [AdminProductController::class, "delete"]);
 
 $app->run();

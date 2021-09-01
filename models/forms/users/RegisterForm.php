@@ -1,6 +1,8 @@
 <?php
 
-namespace app\models\forms;
+namespace app\models\forms\users;
+
+use app\models\forms\Form;
 
 class RegisterForm extends Form
 {

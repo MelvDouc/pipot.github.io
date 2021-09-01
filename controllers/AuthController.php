@@ -11,7 +11,7 @@ class AuthController extends Controller
 {
   public function login(Request $request)
   {
-    if ($this->hasSessionUser())
+    if ($this->getSessionUser())
       return $this->redirectHome([
         "error_message" => "Vous êtes déjà connecté."
       ]);

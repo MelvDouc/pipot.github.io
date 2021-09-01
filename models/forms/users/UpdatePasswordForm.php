@@ -1,9 +1,10 @@
 <?php
 
-namespace app\models\forms;
+namespace app\models\forms\users;
 
 use app\core\Model;
 use app\models\User;
+use app\models\forms\Form;
 
 class UpdatePasswordForm extends Form
 {

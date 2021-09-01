@@ -1,0 +1,47 @@
+{% extends "admin-base.html.twig" %}
+
+{% block title %}Liste des utilisateurs{% endblock %}
+
+{% block main %}
+  <h2>Liste des utilisateurs</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nom d'utilisateur</th>
+        <th>Adresse email</th>
+        <th>Rôle</th>
+        <th>Adresse postale</th>
+        <th>Ville</th>
+        <th>Code postal</th>
+        <th>Numéro de téléphone</th>
+        <th>Compte actif</th>
+        <th>Avatar</th>
+        <th>Date d'inscription</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+        <tr>
+          <td>{{ user.id }}</td>
+          <td><a href="/profil/{{ user.id }}">{{ user.username }}</a></td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.role }}</td>
+          <td>{{ user.postal_address }}</td>
+          <td>{{ user.city }}</td>
+          <td>{{ user.zip_code }}</td>
+          <td>{{ user.phone_number }}</td>
+          <td>{{ user.is_account_active ? "Oui" : "Non" }}</td>
+          <td><img src="/build/users/{{ user.profile_pic }}" alt="{{ user.username }}"></td>
+          <td>{{ user.register_date | date("d-m-Y à H:i") }}</td>
+          <td>
+            <button class="button"><a href="/admin-modifier-utilisateur/{{ user.id }}">Modifier</a></button>
+            {# <form action="/admin-supprimer-utilisateur/{{ user.id }}" method="POST"><input type="submit" value="Supprimer"></form> #}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

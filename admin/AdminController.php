@@ -2,7 +2,6 @@
 
 namespace app\admin;
 
-use app\models\User;
 use app\core\Request;
 use app\models\Login;
 use app\core\Controller;
@@ -12,7 +11,7 @@ class AdminController extends Controller
   public function login(Request $request)
   {
     if ($this->isLoggedAsUser())
-      return $this->redirect("/accueil", "home");
+      return $this->redirectNotFound();
 
     $form = Login::getForm("/admin-connexion");
 
@@ -21,7 +20,7 @@ class AdminController extends Controller
         "form" => $form->createView()
       ]);
 
-    $login = new Login($_POST);
+    $login = new Login($request->getBody());
     $validation = $login->validateAdmin();
 
     if ($validation === Login::ERROR_NOT_ADMIN)

@@ -2,7 +2,6 @@
 
 namespace app\core;
 
-use app\models\Product;
 use app\models\User;
 
 class Session
@@ -12,22 +11,14 @@ class Session
     session_start();
   }
 
-  public function getUser(): array | null
+  public function getUser(): ?array
   {
-    if (!$this->hasUser())
-      return null;
-    $user = &$_SESSION["user"];
-    return $user;
+    return $_SESSION["user"] ?? null;
   }
 
-  public function setUser(array $user): Session
+  public function setUser(array $user): void
   {
-    $user["basket"] = Application::$instance
-      ->database
-      ->getBasket((int)$user["id"]);
     $_SESSION["user"] = $user;
-
-    return $this;
   }
 
   public function updateUser(): void
@@ -46,34 +37,5 @@ class Session
   public function removeUser(): void
   {
     unset($_SESSION["user"]);
-  }
-
-  public function updateProducts(): void
-  {
-    $user = $this->getUser();
-    if (!$user)
-      return;
-    $user["products"] = Application::$instance
-      ->database
-      ->findProductsByUserId((int)$user["id"]);
-    $this->setUser($user);
-  }
-
-  public function updateBasket(): void
-  {
-    if (!$this->hasUser())
-      return;
-    $id = (int)$this->getUser()["id"];
-    $_SESSION["user"]["basket"] = Application::$instance
-      ->database
-      ->getBasket($id);
-  }
-
-  public function isInBasket(int $basket_id): bool
-  {
-    foreach ($this->getUser()["basket"] as $product)
-      if ((int)$product["basket_id"] === $basket_id)
-        return true;
-    return false;
   }
 }

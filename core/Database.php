@@ -2,10 +2,11 @@
 
 namespace app\core;
 
-use app\models\Product;
-use app\models\User;
 use PDO;
 use Dotenv\Dotenv;
+use app\models\User;
+use app\models\Product;
+use app\models\DirectMessage;
 
 class Database
 {
@@ -87,6 +88,16 @@ class Database
   // User
   // ===== ===== ===== ===== =====
 
+  public function findUserAndRatingById(int $id): ?array
+  {
+    $columns = "username, email, role, postal_address, city, zip_code, phone_number,
+    is_account_active, profile_pic, register_date, AVG(score) AS score";
+    $sql = "SELECT $columns FROM users
+    JOIN ratings ON users.id = rated_id
+    WHERE users.id = $id;";
+    return $this->db->query($sql)->fetch();
+  }
+
   public function addUser(User $user): bool
   {
     $hashedPassword = password_hash($user->plain_password, PASSWORD_DEFAULT);
@@ -130,6 +141,22 @@ class Database
       $statement->bindParam($i, $value, \PDO::PARAM_STR);
       $i++;
     }
+    return $statement->execute();
+  }
+
+  // ===== ===== ===== ===== =====
+  // Messages
+  // ===== ===== ===== ===== =====
+
+  public function addMessage(DirectMessage $message): bool
+  {
+    $sql = "INSERT INTO direct_messages (sender_id, recipient_id, subject, content, send_date)
+    VALUES (:sender_id, :recipient_id, :subject, :content, NOW());";
+    $statement = $this->db->prepare($sql);
+    $statement->bindValue(":sender_id", $message->getSenderId(), \PDO::PARAM_INT);
+    $statement->bindValue(":recipient_id", $message->getRecipientId(), \PDO::PARAM_INT);
+    $statement->bindValue(":subject", $message->getSubject(), \PDO::PARAM_STR);
+    $statement->bindValue(":content", $message->getContent(), \PDO::PARAM_STR);
     return $statement->execute();
   }
 
@@ -253,13 +280,11 @@ class Database
   public function addToBasket(array $product, int $buyer_id): bool
   {
     $product_id = (int)$product["id"];
-    $category_id = (int)$product["category_id"];
     $seller_id = (int)$product["seller_id"];
-    $sql = "INSERT INTO basket (product_id, category_id, seller_id, buyer_id, added_at)
-      VALUES (:product_id, :category_id, :seller_id, :buyer_id, NOW());";
+    $sql = "INSERT INTO basket (product_id, seller_id, buyer_id, added_at)
+      VALUES (:product_id, :seller_id, :buyer_id, NOW());";
     $statement = $this->db->prepare($sql);
     $statement->bindParam(":product_id", $product_id, \PDO::PARAM_INT);
-    $statement->bindParam(":category_id", $category_id, \PDO::PARAM_INT);
     $statement->bindParam(":seller_id", $seller_id, \PDO::PARAM_INT);
     $statement->bindParam(":buyer_id", $buyer_id, \PDO::PARAM_INT);
     return $statement->execute();
@@ -267,8 +292,9 @@ class Database
 
   public function deleteFromBasket(int $basket_id): bool
   {
-    $sql = "DELETE FROM basket WHERE id = $basket_id;";
+    $sql = "DELETE FROM basket WHERE id = ?;";
     $statement = $this->db->prepare($sql);
+    $statement->bindParam(1, $basket_id, \PDO::PARAM_INT);
     return $statement->execute();
   }
 }
