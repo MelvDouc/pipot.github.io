@@ -21,6 +21,14 @@ class updateContactForm extends Form
 
     $form = new Form();
     $form->start("/modifier-mes-coordonnees", true);
+    $form->add_input("Prénom", "first_name", "text", false, [
+      "maxlength" => 50,
+      "value" => $first_name
+    ]);
+    $form->add_input("Nom de famille", "last_name", "text", false, [
+      "maxlength" => 50,
+      "value" => $last_name
+    ]);
     $form->add_input("Adresse postale", "postal_address", "text", false, [
       "maxlength" => 255,
       "value" => $postal_address
@@ -64,12 +72,16 @@ class updateContactForm extends Form
 
   public function validate(): string | int
   {
+    if (!$this->isLengthValid("first_name", 50))
+      return "Le prénom ne doit pas dépasser 50 caractères";
+    if (!$this->isLengthValid("last_name", 50))
+      return "Le nom de famille ne doit pas dépasser 50 caractères";
     if (!$this->isLengthValid("postal_address", 255))
       return "L'adresse postale ne doit pas dépasser 255 caractères.";
     if (!$this->isLengthValid("city", 50))
       return "La ville ne doit pas dépasser 50 caractères.";
     if (!$this->isLengthValid("zip_code", 10))
-      return "Le code postal ne doit pas dépasser 50 caractères.";
+      return "Le code postal ne doit pas dépasser 10 caractères.";
     if (!$this->isLengthValid("phone_number", 20))
       return "Le numéro de téléphone ne doit pas dépasser 20 caractères.";
     return 1;

@@ -13,7 +13,7 @@ define("PRODUCT_DB_COLUMNS", [
   "seller_id" => Model::DbColumn(false, "integer", false),
   "category_id" => Model::DbColumn(true, "integer", true),
   "image" => Model::DbColumn(true, "string", false),
-  "creation_date" => Model::DbColumn(false, "string", false)
+  "added_at" => Model::DbColumn(false, "string", false)
 ]);
 
 class Product extends Model

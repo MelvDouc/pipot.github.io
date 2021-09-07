@@ -152,4 +152,22 @@ class ProductController extends Controller
 
     return $this->render("user/my-products");
   }
+
+  public function search(Request $request)
+  {
+    if (!$request->isPost())
+      return $this->redirectNotFound();
+
+    if (!($keywords = $_POST["keywords"] ?? null))
+      return $this->redirectNotFound();
+
+    $products = Application::$instance
+      ->database
+      ->findProductByKeywords($keywords);
+
+    return $this->render("products/search", [
+      "search" => $keywords,
+      "products" => $products ?? false
+    ]);
+  }
 }

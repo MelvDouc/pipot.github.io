@@ -13,6 +13,8 @@ use app\admin\PanelController as AdminPanelController;
 use app\admin\ProductController as AdminProductController;
 use app\admin\UserController as AdminUserController;
 use app\controllers\MessageController;
+use app\controllers\PaymentController;
+use app\controllers\RatingController;
 
 require "../vendor/autoload.php";
 
@@ -60,6 +62,16 @@ $app->get("mes-articles", [ProfileController::class, "my_products"]);
 // Messages
 $app->get("messagerie", [MessageController::class, "my_messages"]);
 $app->post("messagerie", [MessageController::class, "my_messages"]);
+
+// Notation
+$app->post("noter", [RatingController::class, "rate"]);
+
+// Recherche de produits
+$app->post("recherche", [ProductController::class, "search"]);
+
+// Achat de Pipots
+$app->get("acheter-des-pipots", [PaymentController::class, "buyPipots"]);
+$app->post("acheter-des-pipots", [PaymentController::class, "buyPipots"]);
 
 // Admin
 $app->get("admin", [AdminPanelController::class, "panel"]);

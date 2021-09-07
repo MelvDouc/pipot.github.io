@@ -29,7 +29,7 @@
         <td>{{ product.quantity }}</td>
         <td><a href="/categorie/{{ product.category_id }}">{{ product.category }}</a></td>
         <td><a href="profil/{{ product.seller_id }}">{{ product.seller }}</a></td>
-        <td>{{ product.creation_date | date('Y-m-d à H:i') }}</td>
+        <td>{{ product.added_at | date('Y-m-d à H:i') }}</td>
         <td><img src="/build/img/products/{{ product.image }}" alt="{{ product.name }}"></td>
         <td>
           <button class="button"><a href="/admin-modifier-article/{{ product.id }}">Modifier</a></button>

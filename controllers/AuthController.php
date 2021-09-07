@@ -33,8 +33,9 @@ class AuthController extends Controller
       ]);
 
     $login->setLoggedUser();
-    return $this->redirect("/mon-profil", "user/my-profile", [
-      "user" => $login->getUser()
+    return $this->redirect("/mon-profil", "user/profile", [
+      "user" => $login->getUser(),
+      "isUserProfile" => true
     ]);
   }
 

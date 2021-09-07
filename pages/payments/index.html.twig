@@ -1,0 +1,23 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Acheter des Pipots{% endblock %}
+
+{% block main %}
+  <h2>Acheter des Pipots</h2>
+
+  <div class="content">
+    <form action="/acheter-des-pipots" class="payment-form" method="POST">
+      <div class="form-group">
+        <label for="full_name">Prénom NOM</label>
+        <input type="text" name="full_name" id="full_name" placeholder="{{ full_name }}">
+      </div>
+      <div class="form-group">
+        <label for="quantity">Quantité</label>
+        <input type="number" name="quantity" id="quantity" value="1" min="1">
+      </div>
+      <div class="form-submit">
+        <button type="submit">Valider</button>
+      </div>
+    </form>
+  </div>
+{% endblock %}

@@ -23,17 +23,30 @@
 
     {% if not isUserProfile %}
       <div><a href="/contacter/{{ user.id }}">Contacter</a></div>
-      {# TODO: rating form #}
+      <div>
+        <form action="/noter/{{ user.id }}" method="POST">
+          <label for="score">Noter</label>
+          <select name="score" id="score">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+          <button type="submit">Valider</button>
+        </form>
+      </div>
     {% endif %}
 
     <ul>
       <li>{{ user.username }}</li>
+      <li>{{ user.first_name }} {{ user.last_name }}</li>
       <li>{{ user.postal_address }}</li>
       <li>{{ user.city }}</li>
       <li>{{ user.zip_code }}</li>
       <li>{{ user.phone_number }}</li>
       <li>{{ user.score | round(2) }}</li>
-      <li>Membre depuis le {{ user.register_date | date('d-m-Y') }}</li>
+      <li>Membre depuis le {{ user.added_at | date('d-m-Y') }}</li>
     </ul>
   </div>
 {% endblock %}

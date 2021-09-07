@@ -13,8 +13,8 @@ class Controller
 
   protected function redirect(string $location, string $page, array $params = [])
   {
-    header("Location: $location");
-    return $this->render($page, $params);
+    $this->render($page, $params);
+    return header("Location: $location");
   }
 
   protected function redirectHome(array $params = [])

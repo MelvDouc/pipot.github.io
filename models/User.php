@@ -18,7 +18,7 @@ define("USER_DB_COLUMNS", [
   "verification_string" => Model::DbColumn(true, "string", false),
   "is_account_active" => Model::DbColumn(true, "integer", false),
   "profile_pic" => Model::DbColumn(true, "string", true),
-  "register_date" => Model::DbColumn(false, "string", false)
+  "added_at" => Model::DbColumn(false, "string", false)
 ]);
 
 class User extends Model

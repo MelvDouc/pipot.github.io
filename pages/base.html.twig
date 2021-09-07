@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   <link rel="stylesheet" href="/build/css/style.css">
+  {% block scripts %}{% endblock %}
   <script src="/build/js/main.js" type="module" type="text/javascript"></script>
   <title>PIPOT - {% block title %}Page non trouvée{% endblock %}</title>
 </head>
@@ -19,5 +20,6 @@
 </main>
   
 {% include "_partials/footer.html.twig" %}
+{% block enscript %}{% endblock %}
 </body>
 </html>
