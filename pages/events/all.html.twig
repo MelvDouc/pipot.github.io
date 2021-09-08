@@ -1,0 +1,24 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Événements{% endblock %}
+
+{% block main %}
+  <h2>Événements</h2>
+
+  <div class="content">
+    {% for event in events %}
+      <div class="event-card">
+        <div class="left">
+          <img src="/build/img/events/{{ event.image }}" alt="{{ event.name }}">
+        </div>
+        <div class="right">
+          <h3><a href="/evenement/{{ event.id }}">{{ event.name }}</a></h3>
+
+          <p>{{ event.description | u.truncate(50) }}</p>
+          <p>Du {{ event.start_date | date("Y-m-d à H:s") }} au {{ event.end_date | date("Y-m-d à H:s") }}.</p>
+        </div>
+      </div>      
+    {% endfor %}
+  </div>
+
+{% endblock %}

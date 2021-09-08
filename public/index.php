@@ -12,6 +12,8 @@ use app\controllers\RegisterController;
 use app\admin\PanelController as AdminPanelController;
 use app\admin\ProductController as AdminProductController;
 use app\admin\UserController as AdminUserController;
+use app\admin\EventController as AdminEventController;
+use app\controllers\EventController;
 use app\controllers\MessageController;
 use app\controllers\PaymentController;
 use app\controllers\RatingController;
@@ -66,6 +68,10 @@ $app->post("messagerie", [MessageController::class, "my_messages"]);
 // Notation
 $app->post("noter", [RatingController::class, "rate"]);
 
+// Événements
+$app->get("evenements", [EventController::class, "all"]);
+$app->get("evenement", [EventController::class, "single"]);
+
 // Recherche de produits
 $app->post("recherche", [ProductController::class, "search"]);
 
@@ -83,5 +89,11 @@ $app->post("admin-modifier-article", [AdminProductController::class, "update"]);
 $app->get("admin-modifier-utilisateur", [AdminUserController::class, "update"]);
 $app->post("admin-modifier-utilisateur", [AdminUserController::class, "update"]);
 $app->post("admin-supprimer-article", [AdminProductController::class, "delete"]);
+$app->get("admin-ajouter-evenement", [AdminEventController::class, "add"]);
+$app->post("admin-ajouter-evenement", [AdminEventController::class, "add"]);
+$app->get("admin-modifier-evenement", [AdminEventController::class, "update"]);
+$app->post("admin-modifier-evenement", [AdminEventController::class, "update"]);
+$app->post("admin-supprimer-evenement", [AdminEventController::class, "delete"]);
+
 
 $app->run();

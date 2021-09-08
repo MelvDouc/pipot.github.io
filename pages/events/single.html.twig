@@ -1,0 +1,16 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Événement - {{ event.name }}{% endblock %}
+
+{% block main %}
+  <h2>{{ event.name }}</h2>
+
+  <div class="content">
+    {% if isUserAdmin %}
+      <a href="/admin-modifier-evenement/{{ event.id }}">Modifier</a>
+      <form method="POST" action="/admin-supprimer-evenement/{{ event.id }}">
+        <input type="submit" value="Supprimer">
+      </form>
+    {% endif %}
+  </div>
+{% endblock %}

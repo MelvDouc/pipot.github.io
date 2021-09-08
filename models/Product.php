@@ -22,13 +22,9 @@ class Product extends Model
   public const DB_COLUMNS = PRODUCT_DB_COLUMNS;
   public const NAME_MAX_LENGTH = 50;
   public const DEFAULT_IMAGE = "_default.jpg";
-  public const VALID_IMAGE_TYPES = ["image/jpeg", "image/png", "image/jpeg", "image/gif"];
-  public const MAX_IMAGE_SIZE = 2e6;
   public const ERROR_NAME_TOO_LONG = "Le nom du produit ne doit pas dépasser " . self::NAME_MAX_LENGTH . " caractères.";
   public const ERROR_PRICE_NOT_INTEGER = "Le prix du produit doit être un nombre entier.";
   public const ERROR_QUANTIY_NOT_INTEGER = "La quantité doit être un nombre entier.";
-  public const ERROR_INVALID_FILE_TYPE = "L'image doit être au format jpeg, png ou gif.";
-  public const ERROR_FILE_TOO_LARGE = "Le fichier image ne doit pas faire plus de 2 MO.";
   public const ERROR_NO_CATEGORY = "Catégorie non trouvée.";
   private ?string $name;
   private ?string $description;
@@ -103,21 +99,6 @@ class Product extends Model
       return self::ERROR_PRICE_NOT_INTEGER;
     if (!is_int($this->quantity))
       return self::ERROR_QUANTIY_NOT_INTEGER;
-    return 1;
-  }
-
-  private function validate_file_data(): string | int
-  {
-    if (!$this->files) return 1;
-
-    extract($this->files["image"]);
-
-    if ($error === 4)
-      return 1;
-    if (!in_array($type, self::VALID_IMAGE_TYPES))
-      return self::ERROR_INVALID_FILE_TYPE;
-    if ($size > self::MAX_IMAGE_SIZE)
-      return self::ERROR_FILE_TOO_LARGE;
     return 1;
   }
 

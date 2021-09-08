@@ -14,11 +14,11 @@ class ProductController extends AdminController
     if (!$this->isLoggedAsAdmin())
       return $this->redirectHome();
 
-    $id = $request->getParamId();
-    if (!$id) return $this->redirectNotFound();
+    if (!($id = $request->getParamId()))
+      return $this->redirectNotFound();
 
-    $product = $this->findProductById($id);
-    if (!$product) return $this->redirectNotFound();
+    if (!($product = $this->findProductById($id)))
+      return $this->redirectNotFound();
 
     $form = new UpdateProductForm("/admin-modifier-article/$id", $product);
     $params = [
@@ -31,7 +31,7 @@ class ProductController extends AdminController
     if ($request->isGet())
       return $this->render("products/update", $params);
 
-    $updated_product = new Product($_POST, $_FILES, (int)$product["seller_id"]);
+    $updated_product = new Product($request->getBody(), (int)$product["seller_id"]);
     $validation = $updated_product->validate();
 
     if ($validation !== 1) {
@@ -44,7 +44,6 @@ class ProductController extends AdminController
       return $this->render("products/update", $params);
     }
 
-    Application::$instance->session->updateProducts();
     return $this->redirect("/admin-articles", "admin/all-products", []);
   }
 
@@ -56,8 +55,8 @@ class ProductController extends AdminController
     if (!$this->isLoggedAsAdmin())
       return $this->redirectHome();
 
-    $id = $request->getParamId();
-    if (!$id) return $this->redirectNotFound();
+    if (!($id = $request->getParamId()))
+      return $this->redirectNotFound();
 
     $product = $this->findProductById($id);
     if (!$product) return $this->redirectNotFound();
@@ -66,7 +65,6 @@ class ProductController extends AdminController
     $deletion = Application::$instance
       ->database
       ->deleteProduct($product_id);
-    Application::$instance->session->updateProducts();
 
     if (!$deletion)
       return $this->redirect("/admin-articles", "admin/all-products", [

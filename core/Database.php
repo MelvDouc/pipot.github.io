@@ -5,6 +5,7 @@ namespace app\core;
 use PDO;
 use Dotenv\Dotenv;
 use app\models\User;
+use app\models\Event;
 use app\models\Product;
 use app\models\DirectMessage;
 
@@ -337,6 +338,54 @@ class Database
     $statement->bindParam(1, $rated_id, \PDO::PARAM_INT);
     $statement->bindParam(2, $rater_id, \PDO::PARAM_INT);
     $statement->bindParam(3, $score, \PDO::PARAM_INT);
+    return $statement->execute();
+  }
+
+  // ===== ===== ===== ===== =====
+  // Events
+  // ===== ===== ===== ===== =====
+
+  public function addEvent(Event $event): bool
+  {
+    $columns = "name, description, author_id, start_date, end_date";
+    if ($event->getImage())
+      $columns .= ", image";
+    $placeholders = preg_replace("/(\w+)/", ":$1", $columns);
+    $sql = "INSERT INTO events ($columns, added_at) VALUES ($placeholders, NOW())";
+    $statement = $this->db->prepare($sql);
+    $statement->bindValue(":name", $event->getName(), \PDO::PARAM_STR);
+    $statement->bindValue(":description", $event->getDescription(), \PDO::PARAM_STR);
+    $statement->bindValue(":author_id", $event->getAuthorId(), \PDO::PARAM_INT);
+    $statement->bindValue(":start_date", $event->getStartDate(), \PDO::PARAM_STR);
+    $statement->bindValue(":end_date", $event->getEndDate(), \PDO::PARAM_STR);
+    if ($event->getImage())
+      $statement->bindValue(":image", $event->getImage(), \PDO::PARAM_STR);
+
+    return $statement->execute();
+  }
+
+  public function updateEvent(int $eventId, array $updatedColumns): bool
+  {
+    if (!$updatedColumns)
+      return true;
+    $columnNames = implode(", ", array_keys($updatedColumns));
+    $values = preg_replace("/(\w+)/", "$1 = ?", $columnNames);
+    $sql = "UPDATE events SET $values WHERE id = $eventId;";
+    $statement = $this->db->prepare($sql);
+    $i = 1;
+    foreach ($updatedColumns as $key => &$value) {
+      $type = (gettype($value) === "integer") ? \PDO::PARAM_INT : \PDO::PARAM_STR;
+      $statement->bindParam($i, $value, $type);
+      $i++;
+    }
+    return $statement->execute();
+  }
+
+  public function deleteEvent(int $eventId): bool
+  {
+    $sql = "DELETE FROM events WHERE id = ?;";
+    $statement = $this->db->prepare($sql);
+    $statement->bindParam(1, $eventId, \PDO::PARAM_INT);
     return $statement->execute();
   }
 }

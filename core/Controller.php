@@ -11,9 +11,10 @@ class Controller
     Application::$instance->router->renderView($page, $params);
   }
 
-  protected function redirect(string $location, string $page, array $params = [])
+  protected function redirect(string $location, ?string $page = null, array $params = [])
   {
-    $this->render($page, $params);
+    if ($page)
+      $this->render($page, $params);
     return header("Location: $location");
   }
 
