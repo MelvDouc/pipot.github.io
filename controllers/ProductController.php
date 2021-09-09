@@ -34,12 +34,10 @@ class ProductController extends Controller
 
   public function product(Request $request)
   {
-    $id = $request->getParamId();
-    if (!$id)
+    if (!($id = $request->getParamId()))
       return $this->redirectNotFound();
 
-    $product = $this->findProductById($id);
-    if (!$product)
+    if (!($product = $this->findProductById($id)))
       return $this->redirectNotFound();
 
     return $this->render("products/single", [
@@ -50,8 +48,7 @@ class ProductController extends Controller
 
   public function add(Request $request)
   {
-    $user = $this->getSessionUser();
-    if (!$user)
+    if (!($user = $this->getSessionUser()))
       return $this->redirectToLogin();
 
     $form = new AddProductForm();
