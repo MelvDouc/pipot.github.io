@@ -1,0 +1,9 @@
+extends ../base.pug
+
+block main
+  h2 Catégories
+  div.content
+    ul
+      each category in categories
+        li
+          a(href=`/categories/${category.id}`)= category.name

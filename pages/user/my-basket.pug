@@ -1,0 +1,40 @@
+extends ../base.pug
+
+block main
+  h2 Mon panier
+  include ../_inc/user-nav.pug
+  div.content
+    if flashErrors
+      ul
+        each error in flashErrors
+        li= error
+    if flashSuccess
+      p= flashSuccess
+    if !user.basket
+      p Votre panier est vide. Vous pouvez jeter un oeil à la #[a(href="/categories") page des catégories] et ajouter les articles qui vous intéressent.
+    ul
+      each product in user.basket
+        li
+          div.product-card
+            section.left
+              img(src="/build/img/products/" + product.image alt=product.name)
+            section.right
+              h3
+                a(href=`/articles/${product.product_id}`) #{product.name}
+              div.detail
+                dl
+                  dt Description
+                  dd= product.description
+                  dt Prix
+                  dd= product.price
+                  dt Vendu par
+                  dd
+                    a(href=`/profil/${product.seller_id}`) #{product.seller}
+                  dt Catégorie
+                  dd
+                    a(href=`/profil/${product.category_id}`) #{product.category}
+                  dt Publié le
+                  dd= product.added_at
+              div.actions
+                form(method="POST" action=`/suprrimer-du-panier/${product.basket_id}`)
+                  button.button(type="submit") Supprimer

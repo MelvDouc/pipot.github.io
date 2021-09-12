@@ -1,0 +1,21 @@
+extends ../base.pug
+
+block main
+  h2 Messagerie
+  div.content
+    section#inbox
+      each message in received_messages
+        p= message.content
+    section#outbox
+      each message in sent_messages
+        p= message.content
+    section#send-new
+      form(method="POST" action="/")
+        div.form-group
+        //- TODO
+      if flashErrors
+        ul
+          each error in flashErrors
+           li= error
+      if flashSuccess
+        p= flashSuccess

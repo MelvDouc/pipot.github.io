@@ -1,0 +1,14 @@
+extends ../base.pug
+
+block main
+  h2 Événements
+  div.content
+    each event in events
+      div.event-card
+        div.left
+          img(src=`/build/img/events/${event.image}` alt= event.name)
+        div.right
+          h3
+            a(href=`evenements/${event.id}`)= event.name
+          p= event.description
+          p Du #{event.start_date} au #{event.end_date}.

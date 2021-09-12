@@ -26,8 +26,7 @@ $app->get("", [SiteController::class, "home"]);
 $app->get("accueil", [SiteController::class, "home"]);
 
 // Catégories
-$app->get("categorie", [CategoryController::class, "category"]);
-$app->get("categories", [CategoryController::class, "categories"]);
+$app->get("categories", [CategoryController::class, "category"]);
 
 // Article
 $app->get("article", [ProductController::class, "product"]);
@@ -69,8 +68,7 @@ $app->post("messagerie", [MessageController::class, "my_messages"]);
 $app->post("noter", [RatingController::class, "rate"]);
 
 // Événements
-$app->get("evenements", [EventController::class, "all"]);
-$app->get("evenement", [EventController::class, "single"]);
+$app->get("evenements", [EventController::class, "event"]);
 
 // Recherche de produits
 $app->post("recherche", [ProductController::class, "search"]);
@@ -81,19 +79,19 @@ $app->post("acheter-des-pipots", [PaymentController::class, "buyPipots"]);
 
 // Admin
 $app->get("admin", [AdminPanelController::class, "panel"]);
-$app->post("admin-connexion", [AdminController::class, "login"]);
-$app->get("admin-articles", [AdminPanelController::class, "all_products"]);
-$app->get("admin-utilisateurs", [AdminPanelController::class, "all_users"]);
-$app->get("admin-modifier-article", [AdminProductController::class, "update"]);
-$app->post("admin-modifier-article", [AdminProductController::class, "update"]);
-$app->get("admin-modifier-utilisateur", [AdminUserController::class, "update"]);
-$app->post("admin-modifier-utilisateur", [AdminUserController::class, "update"]);
-$app->post("admin-supprimer-article", [AdminProductController::class, "delete"]);
-$app->get("admin-ajouter-evenement", [AdminEventController::class, "add"]);
-$app->post("admin-ajouter-evenement", [AdminEventController::class, "add"]);
-$app->get("admin-modifier-evenement", [AdminEventController::class, "update"]);
-$app->post("admin-modifier-evenement", [AdminEventController::class, "update"]);
-$app->post("admin-supprimer-evenement", [AdminEventController::class, "delete"]);
+$app->post("admin/connexion", [AdminController::class, "login"]);
+$app->get("admin/articles", [AdminPanelController::class, "all_products"]);
+$app->get("admin/utilisateurs", [AdminPanelController::class, "all_users"]);
+$app->get("admin/modifier-article", [AdminProductController::class, "update"]);
+$app->post("admin/modifier-article", [AdminProductController::class, "update"]);
+$app->get("admin/modifier-utilisateur", [AdminUserController::class, "update"]);
+$app->post("admin/modifier-utilisateur", [AdminUserController::class, "update"]);
+$app->post("admin/supprimer-article", [AdminProductController::class, "delete"]);
+$app->get("admin/ajouter-evenement", [AdminEventController::class, "add"]);
+$app->post("admin/ajouter-evenement", [AdminEventController::class, "add"]);
+$app->get("admin/modifier-evenement", [AdminEventController::class, "update"]);
+$app->post("admin/modifier-evenement", [AdminEventController::class, "update"]);
+$app->post("admin/supprimer-evenement", [AdminEventController::class, "delete"]);
 
 
 $app->run();

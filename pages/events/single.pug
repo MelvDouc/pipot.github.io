@@ -1,0 +1,9 @@
+extends ../base.pug
+
+block main
+  h2= event.name
+  if isUserAdmin
+    a(href=`/admin/modifier-evenement/${event.id}`) Modifier
+    form(method="POST" action=`/admin/supprimer-evenement/${event.id}`)
+      button(type="submit") Supprimer
+  p= event.name

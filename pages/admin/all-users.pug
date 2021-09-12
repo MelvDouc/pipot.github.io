@@ -1,0 +1,41 @@
+extends ../base.pug
+
+block main
+  h2 Liste des utilisateurs
+  table
+    thead
+      tr
+        th ID
+        th Nom d'utilisateur
+        th Adresse email
+        th Rôle
+        th Adresse postale
+        th Ville
+        th Code postal
+        th Numéro de téléphone
+        th Compte actif
+        th Avatar
+        th Date d'inscription
+        th Actions
+    tbody
+      each user in users
+        tr
+          td= user.id
+          td
+            a(href=`/profil/${user.id}`)= user.username
+          td= user.email
+          td= user.role
+          td= user.postal_address
+          td= user.city
+          td= user.zip_code
+          td= user.phone_number
+          td= user.is_account_active ? "Oui" : "Non"
+          td
+            img(src=`/build/users/${user.profile_pic}` alt= user.username)
+          td= user.added_at
+          td
+            button.button
+              a(href=`admin/modifier-utilisateur/${user.id}`) Modifier
+            form(method="POST" action=`admin/supprimer-utilisateur/${user.id}`)
+              button(type="submit") Supprimer
+          

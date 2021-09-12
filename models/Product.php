@@ -3,186 +3,118 @@
 namespace app\models;
 
 use app\core\Application;
-use app\core\Model;
 
-define("PRODUCT_DB_COLUMNS", [
-  "name" => Model::DbColumn(true, "string", true),
-  "description" => Model::DbColumn(true, "string", true),
-  "price" => Model::DbColumn(true, "integer", true),
-  "quantity" => Model::DbColumn(true, "integer", true),
-  "seller_id" => Model::DbColumn(false, "integer", false),
-  "category_id" => Model::DbColumn(true, "integer", true),
-  "image" => Model::DbColumn(true, "string", false),
-  "added_at" => Model::DbColumn(false, "string", false)
-]);
-
-class Product extends Model
+class Product
 {
-  public const DB_TABLE = "products";
-  public const DB_COLUMNS = PRODUCT_DB_COLUMNS;
-  public const NAME_MAX_LENGTH = 50;
-  public const DEFAULT_IMAGE = "_default.jpg";
-  public const ERROR_NAME_TOO_LONG = "Le nom du produit ne doit pas dépasser " . self::NAME_MAX_LENGTH . " caractères.";
-  public const ERROR_PRICE_NOT_INTEGER = "Le prix du produit doit être un nombre entier.";
-  public const ERROR_QUANTIY_NOT_INTEGER = "La quantité doit être un nombre entier.";
-  public const ERROR_NO_CATEGORY = "Catégorie non trouvée.";
-  private ?string $name;
-  private ?string $description;
-  private ?int $price;
-  private ?int $quantity = 1;
-  private ?int $category_id;
-  private ?array $files = [];
-  private bool $delete_image;
-  private int $seller_id;
-  private ?string $image = null;
+  public int $id;
+  public string $name;
+  public string $description;
+  public int $price;
+  public int $quantity;
+  public int $seller_id;
+  public int $category_id;
+  public string $image;
+  public string $added_at;
+  private array $errors = [];
 
-  public function __construct(array $body, int $seller_id)
+  private static function findOne($values, $connector = "AND"): ?Product
   {
-    foreach (self::DB_COLUMNS as $name => $value) {
-      if (!$value["from_post"])
-        continue;
-      if (!array_key_exists($name, $body)) {
-        $this->{$name} = null;
-        continue;
-      }
-      $value = $body[$name];
-      $this->{$name} = (is_numeric($value)) ? (int)$value : $value;
-    }
-
-    $this->files = $body["files"] ?? null;
-    $this->seller_id = (int)$seller_id;
-    $this->delete_image = $post["delete_image"] ?? false;
+    $dbProduct = Application::$instance->database->findOne("products", ["*"], $values, $connector);
+    if (!$dbProduct)
+      return null;
+    $product = new Product();
+    $product->id = (int) $dbProduct["id"];
+    $product->name = $dbProduct["name"];
+    $product->description = $dbProduct["description"];
+    $product->price = (int) $dbProduct["price"];
+    $product->quantity = (int) $dbProduct["quantity "];
+    $product->seller_id = (int) $dbProduct["seller_id"];
+    $product->category_id = (int) $dbProduct["category_id"];
+    $product->image = $dbProduct["image"];
+    $product->added_at = $dbProduct["added_at"];
+    return $product;
   }
 
-  public function getName(): string | null
+  public function __construct()
   {
-    return $this->name;
+    $this->image = "_default.jpg";
   }
 
-  public function getDescription(): string | null
+  private function addError($error): void
   {
-    return $this->description;
+    $this->errors[] = $error;
   }
 
-  public function getPrice(): int | null
+  public function getErrors(): array
   {
-    return $this->price;
+    return $this->errors;
   }
 
-  public function getQuantity(): int | null
+  private function checkName(): void
   {
-    return $this->quantity;
-  }
-
-  public function getSellerId(): int | null
-  {
-    return $this->seller_id;
-  }
-
-  public function getCategoryId(): int | null
-  {
-    return $this->category_id;
-  }
-
-  public function getImage(): string
-  {
-    return $this->image;
-  }
-
-  private function validate_post_data(): string | int
-  {
-    if (!$this->name || !$this->description)
-      return parent::ERROR_EMPTY_FIELDS;
-    if (strlen($this->name) > self::NAME_MAX_LENGTH)
-      return self::ERROR_NAME_TOO_LONG;
-    if (!is_int($this->price))
-      return self::ERROR_PRICE_NOT_INTEGER;
-    if (!is_int($this->quantity))
-      return self::ERROR_QUANTIY_NOT_INTEGER;
-    return 1;
-  }
-
-  private function validate_category(): string | int
-  {
-    if (!Application::$instance
-      ->database
-      ->valueExists("categories", "id", $this->category_id))
-      return self::ERROR_NO_CATEGORY;
-    return 1;
-  }
-
-  public function validate(): string | int
-  {
-    $post_validation = $this->validate_post_data();
-    if ($post_validation !== 1)
-      return $post_validation;
-
-    $file_validation = $this->validate_file_data();
-    if ($file_validation !== 1)
-      return $file_validation;
-
-    $category_validation = $this->validate_category();
-    if ($category_validation !== 1)
-      return $category_validation;
-
-    return 1;
-  }
-
-  private function setDefaultImage(): void
-  {
-    $this->image = self::DEFAULT_IMAGE;
-  }
-
-  private function moveImageFile(): void
-  {
-    $extension = pathinfo($this->files["image"]["name"], PATHINFO_EXTENSION);
-    $image_folder = Application::$ROOT_DIR . "/public/build/img/products";
-    $file_name = md5(time()) . ".$extension";
-    move_uploaded_file($this->files["image"]["tmp_name"], "$image_folder/$file_name");
-    $this->image = $file_name;
-  }
-
-  private function saveImage(): void
-  {
-    if ($this->files["image"]["error"] === 4) {
-      $this->setDefaultImage();
+    if (!$this->name) {
+      $this->addError("Veuillez donner un nom à l'article.");
       return;
     }
-    $this->moveImageFile();
+    if (strlen($this->name) > 50)
+      $this->addError("Le nom de l'article ne doit pas dépasser 50 caractères.");
+  }
+
+  private function checkDescription(): void
+  {
+    if (!$this->description)
+      $this->addError("Veuillez décrire l'article.");
+  }
+
+  private function checkPrice(): void
+  {
+    if (!$this->price || gettype($this->price) !== "integer")
+      $this->addError("Le prix doit être un nombre entier supérieur ou égal à 1.");
+  }
+
+  private function checkQuantity(): void
+  {
+    if (!$this->quantity || gettype($this->quantity) !== "integer")
+      $this->addError("La quantité doit être un nombre entier supérieur ou égal à 1.");
+  }
+
+  public function getCategory(): ?Category
+  {
+    if (!$this->category_id) return null;
+    return Category::findOne(["id" => $this->category_id]);
+  }
+
+  private function checkCategory(): void
+  {
+    if (!$this->getCategory())
+      $this->addError("Catégorie non trouvée.");
+  }
+
+  private function isValid(): bool
+  {
+    $this->checkName();
+    $this->checkDescription();
+    $this->checkPrice();
+    $this->checkQuantity();
+    $this->checkCategory();
+    return count($this->errors) === 0;
   }
 
   public function save(): bool
   {
-    $this->saveImage();
-    return Application::$instance->database->addProduct($this);
-  }
-
-  private function updateImage(): void
-  {
-    if ($this->delete_image) {
-      $this->setDefaultImage();
-      return;
-    }
-    if (!$this->files["image"]["name"])
-      return;
-    $this->moveImageFile();
-  }
-
-  public function updateFrom(array $old_product): bool
-  {
-    $this->updateImage();
-    $updated_columns = [];
-    foreach (self::DB_COLUMNS as $name => $value) {
-      if (
-        !$value["updatable"]
-        || $this->{$name} == $old_product[$name]
-        || $name === "image" && !$this->image
-      ) continue;
-      $updated_columns[$name] = $this->{$name};
-    }
-    $id = (int)$old_product["id"];
     return Application::$instance
       ->database
-      ->updateProduct($id, $updated_columns);
+      ->add(
+        "products",
+        [
+          "name" => $this->name,
+          "description" => $this->description,
+          "price" => $this->price,
+          "quantity" => $this->quantity,
+          "seller_id" => $this->seller_id,
+          "category_id" => $this->category_id,
+          "image" => $this->image
+        ]
+      );
   }
 }

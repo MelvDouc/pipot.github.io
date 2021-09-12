@@ -7,6 +7,7 @@ use app\core\Email;
 
 class User
 {
+  public int $id;
   public string $username;
   public string $email;
   public string $password;
@@ -30,6 +31,7 @@ class User
     if (!$dbUser)
       return null;
     $user = new User();
+    $user->id = (int) $dbUser["id"];
     $user->username = $dbUser["username"];
     $user->email = $dbUser["email"];
     $user->password = $dbUser["password"];
@@ -45,6 +47,11 @@ class User
     $user->profile_pic = $dbUser["profile-pic"];
     $user->added_at = $dbUser["added_at"];
     return $user;
+  }
+
+  public function __construct()
+  {
+    $this->profile_pic = "_default.jpg";
   }
 
   private function addError($error): void
@@ -155,7 +162,18 @@ class User
     $this->role = "USER";
     $this->hashPassword();
     $this->setVerificationString();
-    return Application::$instance->database->addUser($this);
+    return Application::$instance
+      ->database
+      ->add(
+        "users",
+        [
+          "username" => $this->username,
+          "email" => $this->email,
+          "password" => $this->password,
+          "role" => $this->role,
+          "verification_string" => $this->verification_string
+        ]
+      );
   }
 
   public function sendConfirmation(): void

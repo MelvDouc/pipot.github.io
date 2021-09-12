@@ -11,21 +11,20 @@ class Session
     session_start();
   }
 
-  public function getUser(): ?array
+  public function getUser(): ?User
   {
     return $_SESSION["user"] ?? null;
   }
 
-  public function setUser(array $user): void
+  public function setUser(User $user): void
   {
     $_SESSION["user"] = $user;
   }
 
   public function updateUser(): void
   {
-    $user = Application::$instance
-      ->database
-      ->findOne(User::DB_TABLE, ["*"], ["id" => $this->getUser()["id"]]);
+    $currentUserId = (int) $this->getUser()->id;
+    $user = User::findOne(["id" => $currentUserId]);
     $this->setUser($user);
   }
 

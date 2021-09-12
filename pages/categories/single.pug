@@ -1,0 +1,27 @@
+extends ../base.pug
+
+block main
+  h2 Catégorie #{category.name}
+  div.content
+    ul
+      each product in products
+        li
+          div.product-card
+            section.left
+              img(src=`/build/img/products/${product.image}` alt=product.name)
+            section.right
+              h3
+                a(href=`/articles/${product.id}`)= product.name
+              div.detail
+                dl
+                  dt Description
+                  dd= product.description
+                  dt Prix
+                  dd= product.price
+                  dt Quantité disponible
+                  dd= product.quantity
+                  dt Vendu par
+                  dd
+                    a(href=`/profil/${product.seller_id}`)= product.seller
+                  dt Publié le
+                  dd= product.added_at

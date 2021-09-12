@@ -1,0 +1,29 @@
+extends ../base.pug
+
+block main
+  h2= product.name
+  div.content
+    div.product-page
+      section.left
+        img(src=`/build/img/products/${product.image}` alt=product.name)
+      section.right
+        h3 Détails
+        div.detail
+          dl
+            dt Description
+            dd= product.description
+            dt Prix en Pipots
+            dd= product.price
+            dt Quantité disponible
+            dd= product.quantity
+            dt Publié par
+            dd
+              a(href=`/profil/${product.seller_id}`)= product.seller
+            dt Publié le
+            dd= product.added_at
+            dt Catégorie
+            dd
+              a(href=`/categories/${product.category_id}`)= product.category
+    if addableToBasket
+      form(method="POST" action=`/ajouter-au-panier/${product.id}`)
+        button.button(type="submit") Ajouter

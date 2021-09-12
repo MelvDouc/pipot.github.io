@@ -6,7 +6,6 @@ use PDO;
 use Dotenv\Dotenv;
 use app\models\User;
 use app\models\Event;
-use app\models\Product;
 use app\models\DirectMessage;
 
 class Database
@@ -85,6 +84,22 @@ class Database
     return $this->db->query($sql)->fetchAll();
   }
 
+  public function add(string $table, array $values): bool
+  {
+    $keys = array_keys($values);
+    $columns = implode(", ", $keys);
+    $placeholdersArray = array_fill(0, count($keys), "?");
+    $placeholders = implode(", ", $placeholdersArray);
+    $sql = "INSERT INTO $table ($columns) VALUES ($placeholders);";
+    $statement = $this->db->prepare($sql);
+    $i = 1;
+    foreach ($values as $value) {
+      $statement->bindValue($i, $value);
+      $i++;
+    }
+    return $statement->execute();
+  }
+
   // ===== ===== ===== ===== =====
   // User
   // ===== ===== ===== ===== =====
@@ -149,21 +164,6 @@ class Database
   // ===== ===== ===== ===== =====
   // Product
   // ===== ===== ===== ===== =====
-
-  public function addProduct(Product $product): bool
-  {
-    $sql = "INSERT INTO products (name, description, price, quantity, seller_id, category_id, image, added_at)
-     VALUES (:name, :description, :price, :quantity, :seller_id, :category_id, :image, NOW());";
-    $statement = $this->db->prepare($sql);
-    $statement->bindParam(":name", $product->getName(), \PDO::PARAM_STR);
-    $statement->bindParam(":description", $product->getDescription(), \PDO::PARAM_STR);
-    $statement->bindParam(":price", $product->getPrice(), \PDO::PARAM_INT);
-    $statement->bindParam(":quantity", $product->getQuantity(), \PDO::PARAM_INT);
-    $statement->bindParam(":seller_id", $product->getSellerId(), \PDO::PARAM_INT);
-    $statement->bindParam(":category_id", $product->getCategoryId(), \PDO::PARAM_INT);
-    $statement->bindParam(":image", $product->getImage(), \PDO::PARAM_STR);
-    return $statement->execute();
-  }
 
   public function updateProduct(int $product_id, array $updated_columns): bool
   {

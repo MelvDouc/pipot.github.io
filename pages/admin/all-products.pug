@@ -1,0 +1,38 @@
+extends ../base.pug
+
+block main
+  h2 Tous les articles
+  table
+    thead
+      tr
+        th ID
+        th Nom
+        th Description
+        th Prix
+        th Quantité
+        th Catégorie
+        th Publié par
+        th Publié le
+        th Image
+        th Actions
+    tbody
+      each product in products
+        tr
+          td
+            a(href=`/article/${product.id}`)= product.name
+          td= product.name
+          td= product.description
+          td= product.price
+          td= product.quantity
+          td
+            a(href=`/categories/${product.category_id}`)= product.category
+          td
+            a(href=`/profil/${product.seller_id}`)= product.seller
+          td= product.added_at
+          td
+            img(src=`/build/img/products/${product.image}` alt=product.name)
+          td
+            button.button
+              a(href=`/admin/modifier-article/${product.id}`) Modifier
+            form(method="POST" action=`/admin/supprimer-article/${product.id}`)
+              input(type="submit" value="Supprimer")
