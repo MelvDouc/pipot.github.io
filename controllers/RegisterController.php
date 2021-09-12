@@ -6,7 +6,6 @@ use app\core\Controller;
 use app\core\Application;
 use app\core\Request;
 use app\models\User;
-use app\models\forms\users\RegisterForm;
 
 class RegisterController extends Controller
 {
@@ -15,28 +14,32 @@ class RegisterController extends Controller
     if (Application::$instance->session->hasUser())
       return $this->redirectHome();
 
-    $form = new RegisterForm();
-
     if ($request->isGet())
       return $this->render("registration/index", [
-        "form" => $form->createView()
+        "title" => "Inscription"
       ]);
 
-    $user = new User($request->getBody());
-    $validation = $user->validate();
-
-    if ($validation !== 1)
+    if (!isset($_POST["agree-terms"]))
       return $this->render("registration/index", [
-        "form" => $form->createView(),
-        "error_message" => $validation
+        "title" => "Inscription",
+        "flashErrors" => ["Veuillez accepter les conditions d'utilisation."]
+      ]);
+
+    $user = new User();
+    $user->username = $_POST["username"] ?? null;
+    $user->email = $_POST["email"] ?? null;
+    $user->setPasswords("plain", $_POST["password"] ?? null);
+    $user->setPasswords("confirm", $_POST["confirm-password"] ?? null);
+
+    if (!$user->isValid())
+      return $this->render("register/index", [
+        "title" => "Inscription",
+        "flashErrors" => $user->getErrors()
       ]);
 
     $user->save();
-    $user->send_verification();
-
-    return $this->redirectHome([
-      "success_message" => "Nous vous avons envoyé un mail confirmant la création de votre compte. Veuillez suivre le lien donné pour l'activer."
-    ]);
+    $user->sendConfirmation();
+    return $this->redirect("/accueil", "home/home");
   }
 
   public function validation()

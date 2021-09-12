@@ -6,6 +6,7 @@ use app\core\Request;
 use app\core\Controller;
 use app\core\Application;
 use app\models\Login;
+use app\models\User;
 
 class AuthController extends Controller
 {
@@ -16,26 +17,30 @@ class AuthController extends Controller
         "error_message" => "Vous êtes déjà connecté."
       ]);
 
-    $form = Login::getForm("/connexion");
-
     if ($request->isGet())
       return $this->render("authentication/login", [
-        "form" => $form->createView()
+        "title" => "Connexion"
       ]);
 
-    $login = new Login($request->getBody());
-    $validation = $login->validate();
+    $uuid = $_POST["uuid"] ?? null;
+    $user = User::findOne(["username" => $uuid, "email" => $uuid], "OR");
 
-    if ($validation !== 1)
+    if (!$user)
       return $this->render("authentication/login", [
-        "form" => $form->createView(),
-        "error_message" => $validation
+        "title" => "Connexion",
+        "flashErrors" => "Identifiants incorrects."
       ]);
 
-    $login->setLoggedUser();
-    return $this->redirect("/mon-profil", "user/profile", [
-      "user" => $login->getUser(),
-      "isUserProfile" => true
+    $user->setPasswords("plain", $_POST["password"] ?? null);
+    if (!$user->comparePassword())
+      return $this->render("authentication/login", [
+        "title" => "Connexion",
+        "flashErrors" => "Identifiants incorrects."
+      ]);
+
+    Application::$instance->session->setUser($user);
+    return $this->redirect("mon-profil", "user/profile", [
+      "title" => "Profil de $user->username"
     ]);
   }
 

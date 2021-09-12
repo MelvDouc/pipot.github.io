@@ -101,23 +101,24 @@ class Database
 
   public function addUser(User $user): bool
   {
-    $hashedPassword = password_hash($user->plain_password, PASSWORD_DEFAULT);
-    $sql = "INSERT INTO users (username, email, password, role, verification_string, is_account_active, added_at)
-      VALUES (:username, :email, :password, :role, :verification_string, 0, NOW());";
+    $sql = "INSERT INTO users (username, email, password, role, verification_string)
+      VALUES (:username, :email, :password, :role, :verification_string);";
     $statement = $this->db->prepare($sql);
-    $statement->bindParam(":username", $user->username, \PDO::PARAM_STR);
-    $statement->bindParam(":email", $user->email, \PDO::PARAM_STR);
-    $statement->bindParam(":password", $hashedPassword, \PDO::PARAM_STR);
-    $statement->bindParam(":role", $user->role, \PDO::PARAM_INT);
-    $statement->bindParam(":verification_string", $user->verification_string, \PDO::PARAM_STR);
+    $statement->bindValue(":username", $user->username, \PDO::PARAM_STR);
+    $statement->bindValue(":email", $user->email, \PDO::PARAM_STR);
+    $statement->bindValue(":password", $user->password, \PDO::PARAM_STR);
+    $statement->bindValue(":role", $user->role, \PDO::PARAM_INT);
+    $statement->bindValue(":verification_string", $user->verification_string, \PDO::PARAM_STR);
     return $statement->execute();
   }
 
   public function activateAccount(string $verification_string): bool
   {
-    $sql = "UPDATE users SET is_account_active = 1, verification_string = '' WHERE verification_string = ?;";
+    $is_account_active = 0;
+    $sql = "UPDATE users SET is_account_active = ?, verification_string = '' WHERE verification_string = ?;";
     $statement = $this->db->prepare($sql);
-    $statement->bindParam(1, $verification_string, \PDO::PARAM_STR);
+    $statement->bindParam(1, $is_account_active, \PDO::PARAM_INT);
+    $statement->bindParam(2, $verification_string, \PDO::PARAM_STR);
     return $statement->execute();
   }
 

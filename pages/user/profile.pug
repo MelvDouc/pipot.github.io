@@ -1,10 +1,7 @@
-{% extends "base.html.twig" %}
+extends ../base.pug
 
-{% block title %}Profil de {{ user.username }}{% endblock %}
+block main
 
-{% block main %}
-
-  <h2>Profil de {{ user.username }}</h2>
   
   {% if isUserProfile %}
     {% include "_partials/user-nav.html.twig" %}

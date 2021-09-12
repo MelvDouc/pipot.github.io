@@ -1,0 +1,28 @@
+extends ../base.pug
+
+block main
+  form(method="POST" action="/inscription")
+    div.form-group
+      label(for="username") Nom d'utilisateur
+      input(type="text" id="username" name="username" required)
+    div.form-group
+      label(for="email") Adresse email
+      input(type="email" id="email" name="email" required)
+    div.form-group
+      label(for="password") Mot de passe
+      input(type="password" id="password" name="password" required)
+    div.form-group
+      label(for="confirm-password") Confirmer mot de passe
+      input(type="password" id="confirm-password" name="confirm-password" required)
+    div.form-checkbox
+      input(type="checkbox" name="agree-terms" id="agree-terms")
+      label(for="agree-terms") Accepter les conditions d'utilisation
+    div.form-submit
+      button(type="submit") S'inscrire
+
+    p Déjà un compte ? #[a(href="/connexion") Se connecter.]
+
+    if flashErrors
+      ul
+        each error in flashErrors
+          li= error 

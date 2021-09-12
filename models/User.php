@@ -4,134 +4,165 @@ namespace app\models;
 
 use app\core\Application;
 use app\core\Email;
-use app\core\Model;
 
-define("USER_DB_COLUMNS", [
-  "username" => Model::DbColumn(false, "string", true),
-  "email" => Model::DbColumn(true, "string", true),
-  "password" => Model::DbColumn(true, "string", false),
-  "role" => Model::DbColumn(true, "integer", false),
-  "postal_address" => Model::DbColumn(true, "string", true),
-  "city" => Model::DbColumn(true, "string", true),
-  "zip_code" => Model::DbColumn(true, "string", true),
-  "phone_number" => Model::DbColumn(true, "string", true),
-  "verification_string" => Model::DbColumn(true, "string", false),
-  "is_account_active" => Model::DbColumn(true, "integer", false),
-  "profile_pic" => Model::DbColumn(true, "string", true),
-  "added_at" => Model::DbColumn(false, "string", false)
-]);
-
-class User extends Model
+class User
 {
-  public const DB_TABLE = "users";
-  public const DB_COLUMNS = USER_DB_COLUMNS;
-  public const ROLES = [
-    "ADMIN" => 0,
-    "USER" => 1
-  ];
-  private const USERNAME_REGEX = "/^[a-zA-Z0-9\_]{6,25}$/";
-  public const PASSWORD_REGEX = "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,25}$/";
-  private const ERROR_USERNAME_FORMAT = "Le nom d'utilisateur doit contenir entre 6 et 25 caractères, lesquels doivent êtres des lettres, des chiffres ou des tirets bas.";
-  private const ERROR_USERNAME_EXISTS = "Nom d'utilisateur indisponible";
-  private const ERROR_EMAIL_FORMAT = "Adresse email non valide.";
-  private const ERROR_EMAIL_EXISTS = "Adresse email déjà utilisée.";
-  public const ERROR_PASSWORD_FORMAT = "Le mot de passe doit contenir entre 8 et 25 caractères dont au moins une minuscule, une majuscule et un chiffre.";
-  public const ERROR_PASSWORDS_NO_MATCH = "Les mots de passe ne sont pas identiques.";
-  private const ERROR_TERMS_NOT_AGREED = "Veuillez accepter les conditions d'utilisation.";
-  public string | null $username;
-  public string | null $email;
-  public string | null $plain_password;
-  public string | null $confirm_password;
-  public int $role = self::ROLES["USER"];
-  public string | null $postal_adress;
-  public string | null $city;
-  public string | null $zip_code;
-  public string | null $phone_number;
-  public string $verification_string;
-  public bool $agrees_terms;
+  public string $username;
+  public string $email;
+  public string $password;
+  private array $passwords = [];
+  public string $role;
+  public ?string $first_name;
+  public ?string $last_name;
+  public ?string $postal_address;
+  public ?string $city;
+  public ?string $zip_code;
+  public ?string $phone_number;
+  public ?string $verification_string;
+  public int $is_account_active;
+  public string $profile_pic;
+  public string $added_at;
+  private array $errors = [];
 
-  public function __construct(array $body)
+  public static function findOne(array $values, string $connector = "AND"): ?User
   {
-    foreach (self::DB_COLUMNS as $name => $value) {
-      if (!$value["from_post"])
-        continue;
-      if (!array_key_exists($name, $body)) {
-        $this->{$name} = null;
+    $dbUser = Application::$instance->database->findOne("users", ["*"], $values, $connector);
+    if (!$dbUser)
+      return null;
+    $user = new User();
+    $user->username = $dbUser["username"];
+    $user->email = $dbUser["email"];
+    $user->password = $dbUser["password"];
+    $user->role = $dbUser["role"];
+    $user->first_name = $dbUser["first_name"];
+    $user->last_name = $dbUser["last_name"];
+    $user->postal_address = $dbUser["postal_address"];
+    $user->city = $dbUser["city"];
+    $user->zip_code = $dbUser["zip_code"];
+    $user->phone_number = $dbUser["phone_number"];
+    $user->verification_string = $dbUser["verification_string"];
+    $user->is_account_active = $dbUser["is_account_active"];
+    $user->profile_pic = $dbUser["profile-pic"];
+    $user->added_at = $dbUser["added_at"];
+    return $user;
+  }
+
+  private function addError($error): void
+  {
+    $this->errors[] = $error;
+  }
+
+  public function getErrors(): array
+  {
+    return $this->errors;
+  }
+
+  private function checkUsername(): void
+  {
+    if (!$this->username) {
+      $this->addError("Veuillez renseigner un nom d'utilisateur.");
+      return;
+    }
+    $usernameExists = Application::$instance
+      ->database
+      ->valueExists("users", "username", $this->username);
+    if ($usernameExists) {
+      $this->addError("Nom d'utilisateur indisponible.");
+      return;
+    }
+    if (!preg_match("/^[a-zA-Z0-9\_]{6,25}$/", $this->username))
+      $this->addError(
+        "Le nom d'utilisateur doit contenir entre 6 et 25 caractères, lesquels doivent êtres des lettres, des chiffres ou des tirets bas."
+      );
+  }
+
+  private function checkEmail(): void
+  {
+    if (!$this->email) {
+      $this->addError("Veuillez renseigner une adresse email.");
+      return;
+    }
+    $emailExists = Application::$instance
+      ->database
+      ->valueExists("users", "email", $this->email);
+    if ($emailExists) {
+      $this->addError("Vous avez déjà un compte.");
+      return;
+    }
+    if (!filter_var($this->email, FILTER_VALIDATE_EMAIL))
+      $this->addError("Adresse email invalide.");
+  }
+
+  public function setPasswords(string $key, string $value): User
+  {
+    $this->passwords[$key] = $value;
+    return $this;
+  }
+
+  public function hashPassword(): void
+  {
+    $this->password = password_hash($this->password, PASSWORD_DEFAULT);
+  }
+
+  public function checkPasswords(): void
+  {
+    $plain = $this->passwords["plain"];
+    $confirm = $this->passwords["confirm"];
+    if (!$plain)
+      $this->addError("Veuillez renseigner un mot de passe.");
+    if (!$confirm)
+      $this->addError("Veuillez confirmer le mot de passe.");
+    if ($plain && !preg_match("/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,25}$/", $plain))
+      $this->addError("Le mot de passe doit contenir entre 8 et 25 caractères dont au moins une minuscule, une majuscule et un chiffre.");
+    if ($plain && $confirm && $plain !== $confirm)
+      $this->addError("Les mots de passe ne se correspondent pas");
+  }
+
+  public function comparePassword(): bool
+  {
+    if (!isset($this->passwords["plain"]))
+      return false;
+    return password_verify($this->passwords["plain"], $this->password);
+  }
+
+  public function setVerificationString(): void
+  {
+    $alphabet = "abcdefghijklmnopqrstuvwxyz";
+    $verifString = "";
+    while (strlen($verifString) < 128) {
+      $isDigit = random_int(0, 1);
+      if ($isDigit) {
+        $verifString .= random_int(0, 9);
         continue;
       }
-      $this->{$name} = $body[$name];
+      $randomLetter = $alphabet[random_int(0, 25)];
+      $isUppercase = random_int(0, 1);
+      $verifString .= $isUppercase ? strtoupper($randomLetter) : $randomLetter;
     }
-
-    $this->plain_password = $body["password"] ?? "";
-    $this->confirm_password = $body["confirm_password"] ?? "";
-    $this->agrees_terms = array_key_exists("agree_terms", $body);
-    $this->verification_string = md5(time());
+    $this->verification_string = $verifString;
   }
 
-  private function validate_username(): string | int
+  public function isValid(): bool
   {
-    if (!preg_match(self::USERNAME_REGEX, $this->username))
-      return self::ERROR_USERNAME_FORMAT;
-    if (Application::$instance->database->valueExists(self::DB_TABLE, "username", $this->username))
-      return self::ERROR_USERNAME_EXISTS;
-    return 1;
+    $this->checkUsername();
+    $this->checkEmail();
+    $this->checkPasswords();
+    return count($this->errors) === 0;
   }
 
-  private function validate_email(): string | int
+  public function save(): bool
   {
-    if (!filter_var($this->email, FILTER_VALIDATE_EMAIL))
-      return self::ERROR_EMAIL_FORMAT;
-    if (Application::$instance->database->valueExists(self::DB_TABLE, "email", $this->email))
-      return self::ERROR_EMAIL_EXISTS;
-    return 1;
+    $this->role = "USER";
+    $this->hashPassword();
+    $this->setVerificationString();
+    return Application::$instance->database->addUser($this);
   }
 
-  private function validate_password(): string | int
+  public function sendConfirmation(): void
   {
-    if (!preg_match(self::PASSWORD_REGEX, $this->plain_password))
-      return self::ERROR_PASSWORD_FORMAT;
-    if ($this->plain_password !== $this->confirm_password)
-      return self::ERROR_PASSWORDS_NO_MATCH;
-    return 1;
-  }
-
-  public function validate(): string | int
-  {
-    if (!$this->username || !$this->email || !$this->plain_password || !$this->confirm_password)
-      return parent::ERROR_EMPTY_FIELDS;
-
-    if (!$this->agrees_terms)
-      return self::ERROR_TERMS_NOT_AGREED;
-
-    $username_validation = $this->validate_username();
-    if ($username_validation !== 1)
-      return $username_validation;
-
-    $email_validation = $this->validate_email();
-    if ($email_validation !== 1)
-      return $email_validation;
-
-    $password_validation = $this->validate_password();
-    if ($password_validation !== 1)
-      return $password_validation;
-
-    return 1;
-  }
-
-  public function save(): void
-  {
-    Application::$instance
-      ->database
-      ->addUser($this);
-    unset($this->plain_password);
-    unset($this->confirm_password);
-  }
-
-  public function send_verification(): void
-  {
-    $email = new Email($this->email, $this->username, "Confirmation d'inscription");
-    $email->set_confirmation_HTML_body($this->verification_string);
+    $email = new Email($this->email, $this->username, "Confirmation de création de compte");
     $email->set_confirmation_alt_body($this->verification_string);
+    $email->set_confirmation_HTML_body($this->verification_string);
     $email->send();
   }
 }
