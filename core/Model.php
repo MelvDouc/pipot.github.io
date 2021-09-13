@@ -2,35 +2,49 @@
 
 namespace app\core;
 
-class Model
+abstract class Model
 {
-  public const ERROR_EMPTY_FIELDS = "Veuillez remplir tous les champs requis.";
-  public const VALID_IMAGE_TYPES = ["image/jpeg", "image/png", "image/jpeg", "image/gif"];
-  public const MAX_IMAGE_SIZE = 2e6;
-  public const ERROR_INVALID_FILE_TYPE = "L'image doit être au format jpeg, png ou gif.";
-  public const ERROR_FILE_TOO_LARGE = "Le fichier image ne doit pas faire plus de 2 MO.";
+  public const DB_TABLE = self::DB_TABLE;
+  public const ALLOWED_FILE_TYPES = ["image/jpeg", "image/png", "image/jpeg", "image/gif"];
+  protected ?array $files;
+  protected array $errors;
 
-  public static function DbColumn(bool $updatable, string $type, bool $from_post)
+  protected function addError(string $error): void
   {
-    return [
-      "updatable" => $updatable,
-      "type" => $type,
-      "from_post" => $from_post,
-    ];
+    $this->errors[] = $error;
   }
 
-  protected function validate_file_data(): string | int
+  public function getErrors(): array
   {
-    if (!$this->files) return 1;
+    return $this->errors;
+  }
 
-    extract($this->files["image"]);
+  public function setFile(array $file): void
+  {
+    $this->file = $file;
+  }
 
-    if ($error === 4)
-      return 1;
-    if (!in_array($type, self::VALID_IMAGE_TYPES))
-      return self::ERROR_INVALID_FILE_TYPE;
-    if ($size > self::MAX_IMAGE_SIZE)
-      return self::ERROR_FILE_TOO_LARGE;
-    return 1;
+  protected function checkFile(): void
+  {
+    if (!$this->file) return;
+    if ($this->file["size"] > 2e6)
+      $this->addError("L'image ne doit pas dépasser 2 Mo.");
+    if (!in_array($this->file["type"], self::ALLOWED_FILE_TYPES))
+      $this->addError("L'image doit être au format jpeg, png ou gif.");
+  }
+
+  protected function saveImage(bool $isNew): void
+  {
+    if (!$this->file && !$isNew) return;
+    if (!$this->file && $isNew) {
+      $this->image = "_default.jpg";
+      return;
+    }
+    $extension = pathinfo($this->file["name"], PATHINFO_EXTENSION);
+    $image_folder = Application::$ROOT_DIR . "/public/build/img/" . self::DB_TABLE;
+    $file_name = md5(time()) . ".$extension";
+    $this->file["file_name"] = $file_name;
+    $this->image = $file_name;
+    move_uploaded_file($this->file["tmp_name"], "$image_folder/$file_name");
   }
 }

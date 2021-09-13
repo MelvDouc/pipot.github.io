@@ -5,8 +5,6 @@ namespace app\admin;
 use app\core\Application;
 use app\core\Request;
 use app\models\Event;
-use app\models\forms\events\AddEventForm;
-use app\models\forms\events\UpdateEventForm;
 
 class EventController extends AdminController
 {
@@ -15,29 +13,29 @@ class EventController extends AdminController
     if (!$this->isLoggedAsAdmin())
       return $this->redirectHome();
 
-    $form = new AddEventForm();
-
     if ($request->isGet())
       return $this->render("admin/events/add", [
-        "form" => $form->createView()
+        "title" => "Ajouter un événement"
       ]);
 
     $userId = (int) $this->getSessionUser()["id"];
+    $body = $request->getBody();
     $event = new Event($request->getBody(), $userId);
-    $validation = $event->validate();
+    $event->name = $body["name"] ?? null;
+    $event->description = $body["description"] ?? null;
+    $event->author_id = $userId;
+    $event->start_date = $body["start_date"] ?? null;
+    $event->end_date = $body["end_date"] ?? null;
+    $event->setFile($_FILES["image"] ?? null);
 
-    if ($validation !== 1)
+    if (!$event->isValid()) {
       return $this->render("admin/events/add", [
-        "form" => $form->createView(),
-        "error_message" => $validation
+        "title" => "Ajouter un événement",
+        "flashErrors" => $event->getErrors()
       ]);
+    }
 
-    if (!$event->save())
-      return $this->render("admin/events/add", [
-        "form" => $form->createView(),
-        "error_message" => "L'ajout de l'événement a échoué."
-      ]);
-
+    $event->save();
     return $this->redirect("/evenements");
   }
 
@@ -49,55 +47,45 @@ class EventController extends AdminController
     if (!($id = $request->getParamId()))
       return $this->redirectNotFound();
 
-    $event = Application::$instance
-      ->database
-      ->findOne(Event::DB_TABLE, ["*"], ["id" => $id]);
-    if (!$event) return $this->redirectNotFound();
-
-    $form = new UpdateEventForm($event);
-    $params = [
-      "form" => $form->createView(),
-      "event_id" => $event["id"],
-      "event_name" => $event["name"]
-    ];
+    if (!($event = Event::findOne(["id" => $id])))
+      return $this->redirectNotFound();
 
     if ($request->isGet())
-      return $this->render("admin/events/update", $params);
+      return $this->render("admin/events/update", [
+        "title" => "Modifier un événement",
+        "event" => $event
+      ]);
 
-    $updatedEvent = new Event($request->getBody(), (int) $event["author_id"]);
+    $body = $request->getBody();
+    $event->name = $body["name"] ?? null;
+    $event->description = $body["description"] ?? null;
+    $event->start_date = $body["start_date"] ?? null;
+    $event->end_date = $body["end_date"] ?? null;
+    $event->setFile($_FILES["image"] ?? null);
 
-    if (!($validation = $updatedEvent->validate())) {
-      $params["error_message"] = $validation;
-      return $this->render("admin/events/update", $params);
+    if (!$event->isValid()) {
+      return $this->render("admin/events/add", [
+        "title" => "Ajouter un événement",
+        "flashErrors" => $event->getErrors()
+      ]);
     }
 
-    if (!$updatedEvent->updateFrom($event)) {
-      $params["error_message"] = "La modification de l'événement a échoué.";
-      return $this->render("admin/events/update", $params);
-    }
-
-    return $this->redirect("/evenements");
+    $event->update();
+    return $this->redirect("/evenements/$id");
   }
 
   public function delete(Request $request)
   {
-    if (!$request->isPost())
-      return $this->redirectNotFound();
-
     if (!$this->isLoggedAsAdmin())
       return $this->redirectHome();
 
     if (!($id = $request->getParamId()))
       return $this->redirectNotFound();
 
-    $event = Application::$instance
-      ->database
-      ->findOne(Event::DB_TABLE, ["*"], ["id" => $id]);
-    if (!$event) return $this->redirectNotFound();
+    if (!($event = Event::findOne(["id" => $id])))
+      return $this->redirectNotFound();
 
-    if (!Application::$instance->database->deleteEvent($id))
-      return $this->redirect("/evenement/$id");
-
+    $event->delete();
     return $this->redirect("/evenements");
   }
 }

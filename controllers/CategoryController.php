@@ -3,41 +3,29 @@
 namespace app\controllers;
 
 use app\core\Controller;
-use app\core\Application;
 use app\core\Request;
+use app\models\Category;
+use app\models\Product;
 
 class CategoryController extends Controller
 {
-  public function categories()
+  public function index(Request $request)
   {
-    $categories = Application::$instance
-      ->database
-      ->findAll("categories");
+    if (!($id = $request->getParamId())) {
+      $categories = Category::findAll();
+      return $this->render("categories/all", [
+        "title" => "Catégories",
+        "categories" => $categories,
+      ]);
+    }
 
-    return $this->render("categories/all", [
-      "categories" => $categories
-    ]);
-  }
-
-  public function category(Request $request)
-  {
-    $id = $request->getParamId();
-    if (!$id)
+    if (!($category = Category::findOne(["id" => $id])))
       return $this->redirectNotFound();
-
-    $category = Application::$instance
-      ->database
-      ->findOne("categories", ["*"], ["id" => $id]);
-    if (!$category)
-      return $this->redirectNotFound();
-
-    $products = Application::$instance
-      ->database
-      ->findCategoryProducts((int)$category["id"]);
 
     return $this->render("categories/single", [
+      "title" => "Catégorie $category->name",
       "category" => $category,
-      "products" => $products
+      "products" => Product::findAll(["category_id" => $id])
     ]);
   }
 }

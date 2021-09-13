@@ -20,7 +20,7 @@ class Controller
 
   protected function redirectHome(array $params = [])
   {
-    return $this->redirect("/accueil", "home", $params);
+    return $this->redirect("/accueil", "home/home", $params);
   }
 
   protected function redirectToLogin()
@@ -35,25 +35,20 @@ class Controller
     return $this->render("404", $params);
   }
 
-  private function hasSessionUser(): bool
-  {
-    return Application::$instance->session->hasUser();
-  }
-
-  protected function getSessionUser(): ?array
+  protected function getSessionUser(): ?User
   {
     return Application::$instance->session->getUser();
   }
 
   protected function isLoggedAsUser(): bool
   {
-    return $this->hasSessionUser()
-      && (int)$this->getSessionUser()["role"] === "USER";
+    return $this->getSessionUser()
+      && (int)$this->getSessionUser()->role === "USER";
   }
 
   protected function isLoggedAsAdmin(): bool
   {
-    return $this->hasSessionUser()
-      && (int)$this->getSessionUser()["role"] === "ADMIN";
+    return $this->getSessionUser()
+      && (int)$this->getSessionUser()->role === "ADMIN";
   }
 }

@@ -2,40 +2,25 @@
 
 namespace app\controllers;
 
-use app\core\Application;
 use app\core\Controller;
 use app\core\Request;
 use app\models\Event;
 
 class EventController extends Controller
 {
-  private function findEvent(int $id): ?array
-  {
-    return Application::$instance
-      ->database
-      ->findOne(Event::DB_TABLE, ["*"], ["id" => $id]);
-  }
-
-  public function all()
-  {
-    $events = Application::$instance
-      ->database
-      ->findAll(Event::DB_TABLE);
-
-    $this->render("events/all", [
-      "events" => $events
-    ]);
-  }
-
-  public function single(Request $request)
+  public function index(Request $request)
   {
     if (!($id = $request->getParamId()))
-      return $this->redirectNotFound();
+      return $this->render("events/all", [
+        "title" => "Événements",
+        "events" => Event::findAll()
+      ]);
 
-    if (!($event = $this->findEvent($id)))
+    if (!($event = Event::findOne(["id" => $id])))
       return $this->redirectNotFound();
 
     return $this->render("events/single", [
+      "title" => $event->name,
       "event" => $event,
       "isUserAdmin" => $this->isLoggedAsAdmin()
     ]);

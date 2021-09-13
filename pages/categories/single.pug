@@ -22,6 +22,6 @@ block main
                   dd= product.quantity
                   dt Vendu par
                   dd
-                    a(href=`/profil/${product.seller_id}`)= product.seller
+                    a(href=`/profil/${product.seller_id}`)= product.getSellerUsername()
                   dt Publié le
                   dd= product.added_at

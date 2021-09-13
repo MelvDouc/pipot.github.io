@@ -7,69 +7,76 @@ use app\core\Model;
 
 class DirectMessage extends Model
 {
+  public const DB_TABLE = "direct_messages";
   public const ERROR_RECIPIENT_NOT_EXISTS = "Aucun utilisateur ne correspond à ce destinataire.";
   public const ERROR_SELF_MESSAGE = "Vous ne pouvez pas vous envoyer un message à vous-même.";
-  private int $sender_id;
-  private ?string $recipient = null;
-  private ?int $recipient_id = null;
-  private ?string $subject = null;
-  private ?string $content = null;
+  public int $id;
+  public int $sender_id;
+  public int $recipient_id;
+  public string $subject;
+  public string $content;
+  public string $added_at;
 
-  public function __construct(int $sender_id, array $body)
+  public static function findAll(array $where): ?array
   {
-    $this->sender_id = $sender_id;
-
-    foreach ($body as $key => $value)
-      if (property_exists(self::class, $key))
-        $this->{$key} = $value;
-    $this->setRecipientId();
+    $dbMessages = Application::$instance
+      ->database
+      ->findAll(self::DB_TABLE, ["*"], $where);
+    if (!$dbMessages) return null;
+    return array_map(function ($dbMessage) {
+      $instance = new DirectMessage();
+      $instance->id = (int) $dbMessage["id"];
+      $instance->sender_id = (int) $dbMessage["sender_id"];
+      $instance->recipient_id = (int) $dbMessage["recipient_id"];
+      $instance->subject = $dbMessage["subject"];
+      $instance->content = $dbMessage["content"];
+      $instance->added_at = $dbMessage["added_at"];
+      return $instance;
+    }, $dbMessages);
   }
 
-  public function validate(): string | int
+  private function checkSubject(): void
   {
-    if (!$this->recipient || !$this->subject || !$this->content)
-      return parent::ERROR_EMPTY_FIELDS;
-    if (!$this->recipient_id)
-      return self::ERROR_RECIPIENT_NOT_EXISTS;
-    if ($this->recipient_id === $this->sender_id)
-      return self::ERROR_SELF_MESSAGE;
-    return 1;
+    if (!$this->subject || strlen($this->subject) > 50)
+      $this->addError("Le sujet ne doit dépasser 50 caractères.");
   }
 
-  public function send(): bool
+  private function checkContent(): void
+  {
+    if (!$this->content)
+      $this->addError("Veuillez ajouter un message.");
+  }
+
+  private function checkRecipientId(): void
+  {
+    $recipient = User::findOne(["id" => $this->recipient_id]);
+    if (!$recipient)
+      $this->addError("Destinataire non trouvé.");
+  }
+
+  public function isValid(): bool
+  {
+    $this->checkSubject();
+    $this->checkContent();
+    $this->checkRecipientId();
+    return count($this->errors) === 0;
+  }
+
+  public function save(): bool
   {
     return Application::$instance
       ->database
-      ->addMessage($this);
-  }
-
-  public function getSenderId(): int
-  {
-    return $this->sender_id;
-  }
-
-  public function getRecipientId(): ?int
-  {
-    return $this->recipient_id;
-  }
-
-  private function setRecipientId(): void
-  {
-    if (!$this->recipient) return;
-
-    $id_search = Application::$instance
-      ->database
-      ->findOne(User::DB_TABLE, ["id"], ["username" => $this->recipient]);
-    $this->recipient_id = $id_search ? (int)$id_search["id"] : null;
-  }
-
-  public function getSubject(): ?string
-  {
-    return $this->subject;
-  }
-
-  public function getContent(): ?string
-  {
-    return $this->content;
+      ->add(
+        self::DB_TABLE,
+        [
+          "name" => $this->name,
+          "description" => $this->description,
+          "price" => $this->price,
+          "quantity" => $this->quantity,
+          "seller_id" => $this->seller_id,
+          "category_id" => $this->category_id,
+          "image" => $this->image
+        ]
+      );
   }
 }

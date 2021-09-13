@@ -5,8 +5,6 @@ namespace app\core;
 use PDO;
 use Dotenv\Dotenv;
 use app\models\User;
-use app\models\Event;
-use app\models\DirectMessage;
 
 class Database
 {
@@ -100,6 +98,28 @@ class Database
     return $statement->execute();
   }
 
+  public function update(string $table, array $values, int $id): bool
+  {
+    $placeholdersArray = array_map(fn ($key) => "$key = ?", array_keys($values));
+    $placeholders = implode(", ", $placeholdersArray);
+    $sql = "UPDATE $table SET $placeholders WHERE id = $id;";
+    $statement = $this->db->prepare($sql);
+    $i = 1;
+    foreach ($values as $value) {
+      $statement->bindValue($i, $value);
+      $i++;
+    }
+    return $statement->execute();
+  }
+
+  public function delete(string $table, int $id): bool
+  {
+    $sql = "DELETE FROM $table WHERE id = ?;";
+    $statement = $this->db->prepare($sql);
+    $statement->bindValue(1, $id);
+    return $statement->execute();
+  }
+
   // ===== ===== ===== ===== =====
   // User
   // ===== ===== ===== ===== =====
@@ -107,88 +127,16 @@ class Database
   public function findUserAndRatingById(int $id): ?array
   {
     $columns = "users.id AS id, username, email, role, first_name, last_name, postal_address, city, zip_code, phone_number,
-    is_account_active, profile_pic, users.added_at, AVG(score) AS score";
+    is_account_active, image, users.added_at, AVG(score) AS score";
     $sql = "SELECT $columns FROM users
     JOIN ratings ON users.id = rated_id
     WHERE users.id = $id;";
     return $this->db->query($sql)->fetch();
   }
 
-  public function addUser(User $user): bool
-  {
-    $sql = "INSERT INTO users (username, email, password, role, verification_string)
-      VALUES (:username, :email, :password, :role, :verification_string);";
-    $statement = $this->db->prepare($sql);
-    $statement->bindValue(":username", $user->username, \PDO::PARAM_STR);
-    $statement->bindValue(":email", $user->email, \PDO::PARAM_STR);
-    $statement->bindValue(":password", $user->password, \PDO::PARAM_STR);
-    $statement->bindValue(":role", $user->role, \PDO::PARAM_INT);
-    $statement->bindValue(":verification_string", $user->verification_string, \PDO::PARAM_STR);
-    return $statement->execute();
-  }
-
-  public function activateAccount(string $verification_string): bool
-  {
-    $is_account_active = 0;
-    $sql = "UPDATE users SET is_account_active = ?, verification_string = '' WHERE verification_string = ?;";
-    $statement = $this->db->prepare($sql);
-    $statement->bindParam(1, $is_account_active, \PDO::PARAM_INT);
-    $statement->bindParam(2, $verification_string, \PDO::PARAM_STR);
-    return $statement->execute();
-  }
-
-  public function updatePassword(int $user_id, string $hashed_password): bool
-  {
-    $sql = "UPDATE users SET password = ? WHERE id = $user_id;";
-    $statement = $this->db->prepare($sql);
-    $statement->bindParam(1, $hashed_password, \PDO::PARAM_STR);
-    return $statement->execute();
-  }
-
-  public function updateContact(int $user_id, array $updated_columns): bool
-  {
-    if (!$updated_columns)
-      return true;
-    $column_names = implode(", ", array_keys($updated_columns));
-    $values = preg_replace("/(\w+)/", "$1 = ?", $column_names);
-    $sql = "UPDATE users SET $values WHERE id = $user_id;";
-    $statement = $this->db->prepare($sql);
-    $i = 1;
-    foreach ($updated_columns as $key => &$value) {
-      $statement->bindParam($i, $value, \PDO::PARAM_STR);
-      $i++;
-    }
-    return $statement->execute();
-  }
-
   // ===== ===== ===== ===== =====
   // Product
   // ===== ===== ===== ===== =====
-
-  public function updateProduct(int $product_id, array $updated_columns): bool
-  {
-    if (!$updated_columns)
-      return true;
-    $column_names = implode(", ", array_keys($updated_columns));
-    $values = preg_replace("/(\w+)/", "$1 = ?", $column_names);
-    $sql = "UPDATE products SET $values WHERE id = $product_id;";
-    $statement = $this->db->prepare($sql);
-    $i = 1;
-    foreach ($updated_columns as $key => &$value) {
-      $type = (gettype($value) === "integer") ? \PDO::PARAM_INT : \PDO::PARAM_STR;
-      $statement->bindParam($i, $value, $type);
-      $i++;
-    }
-    return $statement->execute();
-  }
-
-  public function deleteProduct(int $id): bool
-  {
-    $sql = "DELETE FROM products WHERE id = ?";
-    $statement = $this->db->prepare($sql);
-    $statement->bindParam(1, $id, \PDO::PARAM_INT);
-    return $statement->execute();
-  }
 
   public function findProductById(int $id): array | false
   {
@@ -301,92 +249,6 @@ class Database
     $sql = "DELETE FROM basket WHERE id = ?;";
     $statement = $this->db->prepare($sql);
     $statement->bindParam(1, $basket_id, \PDO::PARAM_INT);
-    return $statement->execute();
-  }
-
-  // ===== ===== ===== ===== =====
-  // Messages
-  // ===== ===== ===== ===== =====
-
-  public function addMessage(DirectMessage $message): bool
-  {
-    $sql = "INSERT INTO direct_messages (sender_id, recipient_id, subject, content, added_at)
-    VALUES (:sender_id, :recipient_id, :subject, :content, NOW());";
-    $statement = $this->db->prepare($sql);
-    $statement->bindValue(":sender_id", $message->getSenderId(), \PDO::PARAM_INT);
-    $statement->bindValue(":recipient_id", $message->getRecipientId(), \PDO::PARAM_INT);
-    $statement->bindValue(":subject", $message->getSubject(), \PDO::PARAM_STR);
-    $statement->bindValue(":content", $message->getContent(), \PDO::PARAM_STR);
-    return $statement->execute();
-  }
-
-  // ===== ===== ===== ===== =====
-  // Ratings
-  // ===== ===== ===== ===== =====
-
-  public function addRating(int $rated_id, int $rater_id, int $score): bool
-  {
-    $where = "WHERE rated_id = $rated_id AND rater_id = $rater_id";
-    $query = $this->db->query("SELECT * FROM ratings $where;");
-    $query = $query->fetch();
-
-    if (!$query)
-      $sql = "INSERT INTO ratings (rated_id, rater_id, score, added_at) VALUES (?, ?, ?, NOW());";
-    else
-      $sql = "UPDATE ratings SET rated_id = ?, rater_id = ?, score = ?, added_at = NOW() $where";
-
-    $statement = $this->db->prepare($sql);
-    $statement->bindParam(1, $rated_id, \PDO::PARAM_INT);
-    $statement->bindParam(2, $rater_id, \PDO::PARAM_INT);
-    $statement->bindParam(3, $score, \PDO::PARAM_INT);
-    return $statement->execute();
-  }
-
-  // ===== ===== ===== ===== =====
-  // Events
-  // ===== ===== ===== ===== =====
-
-  public function addEvent(Event $event): bool
-  {
-    $columns = "name, description, author_id, start_date, end_date";
-    if ($event->getImage())
-      $columns .= ", image";
-    $placeholders = preg_replace("/(\w+)/", ":$1", $columns);
-    $sql = "INSERT INTO events ($columns, added_at) VALUES ($placeholders, NOW())";
-    $statement = $this->db->prepare($sql);
-    $statement->bindValue(":name", $event->getName(), \PDO::PARAM_STR);
-    $statement->bindValue(":description", $event->getDescription(), \PDO::PARAM_STR);
-    $statement->bindValue(":author_id", $event->getAuthorId(), \PDO::PARAM_INT);
-    $statement->bindValue(":start_date", $event->getStartDate(), \PDO::PARAM_STR);
-    $statement->bindValue(":end_date", $event->getEndDate(), \PDO::PARAM_STR);
-    if ($event->getImage())
-      $statement->bindValue(":image", $event->getImage(), \PDO::PARAM_STR);
-
-    return $statement->execute();
-  }
-
-  public function updateEvent(int $eventId, array $updatedColumns): bool
-  {
-    if (!$updatedColumns)
-      return true;
-    $columnNames = implode(", ", array_keys($updatedColumns));
-    $values = preg_replace("/(\w+)/", "$1 = ?", $columnNames);
-    $sql = "UPDATE events SET $values WHERE id = $eventId;";
-    $statement = $this->db->prepare($sql);
-    $i = 1;
-    foreach ($updatedColumns as $key => &$value) {
-      $type = (gettype($value) === "integer") ? \PDO::PARAM_INT : \PDO::PARAM_STR;
-      $statement->bindParam($i, $value, $type);
-      $i++;
-    }
-    return $statement->execute();
-  }
-
-  public function deleteEvent(int $eventId): bool
-  {
-    $sql = "DELETE FROM events WHERE id = ?;";
-    $statement = $this->db->prepare($sql);
-    $statement->bindParam(1, $eventId, \PDO::PARAM_INT);
     return $statement->execute();
   }
 }

@@ -8,6 +8,8 @@ class SiteController extends Controller
 {
   public function home()
   {
-    return $this->render("home");
+    return $this->render("home/home", [
+      "title" => "Accueil"
+    ]);
   }
 }

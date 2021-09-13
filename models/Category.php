@@ -3,9 +3,11 @@
 namespace app\models;
 
 use app\core\Application;
+use app\core\Model;
 
-class Category
+class Category extends Model
 {
+  public const DB_TABLE = "categories";
   public int $id;
   public string $name;
   public string $description;
@@ -16,7 +18,7 @@ class Category
   {
     $dbCategory = Application::$instance
       ->database
-      ->findOne("categories", ["*"], $values, $connector);
+      ->findOne(self::DB_TABLE, ["*"], $values, $connector);
     if (!$dbCategory) return null;
     $category = new Category();
     $category->id = $dbCategory["id"];
@@ -25,5 +27,12 @@ class Category
     $category->image = $dbCategory["image"];
     $category->added_at = $dbCategory["added_at"];
     return $category;
+  }
+
+  public static function findAll(): ?array
+  {
+    return Application::$instance
+      ->database
+      ->findAll(self::DB_TABLE);
   }
 }

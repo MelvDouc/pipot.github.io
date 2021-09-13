@@ -2,10 +2,12 @@
 
 namespace app\models;
 
+use app\core\Model;
 use app\core\Application;
 
-class Product
+class Product extends Model
 {
+  public const DB_TABLE = "products";
   public int $id;
   public string $name;
   public string $description;
@@ -15,19 +17,15 @@ class Product
   public int $category_id;
   public string $image;
   public string $added_at;
-  private array $errors = [];
 
-  private static function findOne($values, $connector = "AND"): ?Product
+  private static function instantiate(array $dbProduct): Product
   {
-    $dbProduct = Application::$instance->database->findOne("products", ["*"], $values, $connector);
-    if (!$dbProduct)
-      return null;
     $product = new Product();
     $product->id = (int) $dbProduct["id"];
     $product->name = $dbProduct["name"];
     $product->description = $dbProduct["description"];
     $product->price = (int) $dbProduct["price"];
-    $product->quantity = (int) $dbProduct["quantity "];
+    $product->quantity = (int) $dbProduct["quantity"];
     $product->seller_id = (int) $dbProduct["seller_id"];
     $product->category_id = (int) $dbProduct["category_id"];
     $product->image = $dbProduct["image"];
@@ -35,19 +33,34 @@ class Product
     return $product;
   }
 
-  public function __construct()
+  public static function findOne($values, $connector = "AND"): ?Product
   {
-    $this->image = "_default.jpg";
+    $dbProduct = Application::$instance
+      ->database
+      ->findOne(self::DB_TABLE, ["*"], $values, $connector);
+    if (!$dbProduct)
+      return null;
+    return self::instantiate($dbProduct);
   }
 
-  private function addError($error): void
+  public static function findAll(array $where = [], $connector = "AND")
   {
-    $this->errors[] = $error;
+    $dbProducts = Application::$instance
+      ->database
+      ->findAll(self::DB_TABLE, ["*"], $where, $connector);
+    return array_map(fn ($dbProduct) => self::instantiate($dbProduct), $dbProducts);
   }
 
-  public function getErrors(): array
+  public function getSellerUsername(): string
   {
-    return $this->errors;
+    $seller = User::findOne(["id" => $this->seller_id]);
+    return $seller->username;
+  }
+
+  public function getCategoryName(): string
+  {
+    $category = Category::findOne(["id" => $this->category_id]);
+    return $category->name;
   }
 
   private function checkName(): void
@@ -90,22 +103,24 @@ class Product
       $this->addError("Catégorie non trouvée.");
   }
 
-  private function isValid(): bool
+  public function isValid(): bool
   {
     $this->checkName();
     $this->checkDescription();
     $this->checkPrice();
     $this->checkQuantity();
     $this->checkCategory();
+    $this->checkFile();
     return count($this->errors) === 0;
   }
 
   public function save(): bool
   {
+    $this->saveImage(true);
     return Application::$instance
       ->database
       ->add(
-        "products",
+        self::DB_TABLE,
         [
           "name" => $this->name,
           "description" => $this->description,
@@ -116,5 +131,22 @@ class Product
           "image" => $this->image
         ]
       );
+  }
+
+  public function update(): bool
+  {
+    $this->saveImage(false);
+    $values = [
+      "name" => $this->name,
+      "description" => $this->description,
+      "price" => $this->price,
+      "quantity" => $this->quantity,
+      "seller_id" => $this->seller_id,
+      "category_id" => $this->category_id,
+      "image" => $this->image
+    ];
+    return Application::$instance
+      ->database
+      ->update(self::DB_TABLE, $values, $this->id);
   }
 }

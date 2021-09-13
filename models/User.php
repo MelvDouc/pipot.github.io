@@ -4,9 +4,11 @@ namespace app\models;
 
 use app\core\Application;
 use app\core\Email;
+use app\core\Model;
 
-class User
+class User extends Model
 {
+  public const DB_TABLE = "users";
   public int $id;
   public string $username;
   public string $email;
@@ -21,15 +23,11 @@ class User
   public ?string $phone_number;
   public ?string $verification_string;
   public int $is_account_active;
-  public string $profile_pic;
+  public string $image;
   public string $added_at;
-  private array $errors = [];
 
-  public static function findOne(array $values, string $connector = "AND"): ?User
+  private static function instantiate(array $dbUser): User
   {
-    $dbUser = Application::$instance->database->findOne("users", ["*"], $values, $connector);
-    if (!$dbUser)
-      return null;
     $user = new User();
     $user->id = (int) $dbUser["id"];
     $user->username = $dbUser["username"];
@@ -44,24 +42,30 @@ class User
     $user->phone_number = $dbUser["phone_number"];
     $user->verification_string = $dbUser["verification_string"];
     $user->is_account_active = $dbUser["is_account_active"];
-    $user->profile_pic = $dbUser["profile-pic"];
+    $user->image = $dbUser["image"];
     $user->added_at = $dbUser["added_at"];
     return $user;
   }
 
-  public function __construct()
+  public static function findOne(array $values, string $connector = "AND"): ?User
   {
-    $this->profile_pic = "_default.jpg";
+    $dbUser = Application::$instance->database->findOne(self::DB_TABLE, ["*"], $values, $connector);
+    if (!$dbUser)
+      return null;
+    return self::instantiate($dbUser);
   }
 
-  private function addError($error): void
+  public static function findAll()
   {
-    $this->errors[] = $error;
+    $dbUsers = Application::$instance->database->findAll(self::DB_TABLE);
+    return array_map(fn ($dbUser) => self::instantiate($dbUser), $dbUsers);
   }
 
-  public function getErrors(): array
+  public function getBasket(): ?array
   {
-    return $this->errors;
+    return Application::$instance
+      ->database
+      ->findAll("basket", ["*"], ["buyer_id" => $this->id]);
   }
 
   private function checkUsername(): void
@@ -132,6 +136,26 @@ class User
     return password_verify($this->passwords["plain"], $this->password);
   }
 
+  private function checkContact(): void
+  {
+    $contactProperties = [
+      ["first_name", 50, "Le prénom"],
+      ["last_name", 50, "Le nom de famille"],
+      ["postal_address", 25, "L'adresse postale"],
+      ["city", 50, "La ville"],
+      ["zip_code", 10, "Le code postal"],
+      ["phone_number", 20, "Le numéro de téléphone"]
+    ];
+    foreach ($contactProperties as $property) {
+      $name = $property[0];
+      $maxlength = $property[1];
+      $translation = $property[2];
+      if (!$this->{$name}) continue;
+      if (strlen($this->{$name}) > $maxlength)
+        $this->addError("$translation ne doit pas dépasser $maxlength caractères.");
+    }
+  }
+
   public function setVerificationString(): void
   {
     $alphabet = "abcdefghijklmnopqrstuvwxyz";
@@ -154,6 +178,8 @@ class User
     $this->checkUsername();
     $this->checkEmail();
     $this->checkPasswords();
+    $this->checkFile();
+    $this->checkContact();
     return count($this->errors) === 0;
   }
 
@@ -161,6 +187,7 @@ class User
   {
     $this->role = "USER";
     $this->hashPassword();
+    $this->saveImage(true);
     $this->setVerificationString();
     return Application::$instance
       ->database
@@ -171,8 +198,30 @@ class User
           "email" => $this->email,
           "password" => $this->password,
           "role" => $this->role,
-          "verification_string" => $this->verification_string
+          "verification_string" => $this->verification_string,
+          "image" => $this->image
         ]
+      );
+  }
+
+  public function update(): bool
+  {
+    $this->saveImage(false);
+    return Application::$instance
+      ->database
+      ->update(
+        self::DB_TABLE,
+        [
+          "password" => $this->password,
+          "first_name" => $this->first_name,
+          "last_name" => $this->last_name,
+          "postal_address" => $this->postal_address,
+          "city" => $this->city,
+          "zip_code" => $this->zip_code,
+          "phone_number" => $this->phone_number,
+          "image" => $this->image
+        ],
+        $this->id
       );
   }
 

@@ -10,9 +10,19 @@ block main
       each message in sent_messages
         p= message.content
     section#send-new
-      form(method="POST" action="/")
+      form(method="POST" action="/messagerie")
         div.form-group
-        //- TODO
+          label(for="subject") Sujet
+          input(type="text" name="subject" id="subject" maxlength="50" required)
+        div.form-select
+          select(id="recipient_id" name="recipient_id")
+            each user in users
+              option(value= user.id)= user.username
+        div.form-group
+          label(for="content") Message
+          textarea(id="content" name="content" required)
+        div.form-submit
+          button(type="submit") Envoyer
       if flashErrors
         ul
           each error in flashErrors

@@ -26,10 +26,10 @@ $app->get("/", [SiteController::class, "home"]);
 $app->get("/accueil", [SiteController::class, "home"]);
 
 // Catégories
-$app->get("/categories", [CategoryController::class, "category"]);
+$app->get("/categories", [CategoryController::class, "index"]);
 
-// Article
-$app->get("/article", [ProductController::class, "product"]);
+// Articles
+$app->get("/articles", [ProductController::class, "product"]);
 $app->get("/ajouter-article", [ProductController::class, "add"]);
 $app->post("/ajouter-article", [ProductController::class, "add"]);
 $app->get("/modifier-article", [ProductController::class, "update"]);
@@ -68,7 +68,7 @@ $app->post("/messagerie", [MessageController::class, "my_messages"]);
 $app->post("/noter", [RatingController::class, "rate"]);
 
 // Événements
-$app->get("/evenements", [EventController::class, "event"]);
+$app->get("/evenements", [EventController::class, "index"]);
 
 // Recherche de produits
 $app->post("/recherche", [ProductController::class, "search"]);
