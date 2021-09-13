@@ -48,26 +48,12 @@ class Controller
   protected function isLoggedAsUser(): bool
   {
     return $this->hasSessionUser()
-      && (int)$this->getSessionUser()["role"] === User::ROLES["USER"];
+      && (int)$this->getSessionUser()["role"] === "USER";
   }
 
   protected function isLoggedAsAdmin(): bool
   {
     return $this->hasSessionUser()
-      && (int)$this->getSessionUser()["role"] === User::ROLES["ADMIN"];
-  }
-
-  protected function findUserById(int $id): ?array
-  {
-    return Application::$instance
-      ->database
-      ->findOne(User::DB_TABLE, ["*"]);
-  }
-
-  protected function findProductById(int $id): ?array
-  {
-    return Application::$instance
-      ->database
-      ->findProductById($id);
+      && (int)$this->getSessionUser()["role"] === "ADMIN";
   }
 }

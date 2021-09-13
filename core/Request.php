@@ -7,7 +7,7 @@ class Request
 
   public function getPath()
   {
-    return explode("/", $_SERVER["REQUEST_URI"])[1];
+    return preg_replace("/\/\d+$/", "", $_SERVER["REQUEST_URI"]);
   }
 
   public function getParamId(): int | null

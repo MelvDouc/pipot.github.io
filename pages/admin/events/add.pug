@@ -1,0 +1,24 @@
+extends ../base.pug
+
+block main
+  h2 Ajouter un événement
+  form(method="POST" action="/admin/ajouter-evenement")
+    div.form-group
+      label(for="name") Nom de l'événement
+      input(type="text" id="name" name="name" maxlength="50" required)
+    div.form-group
+      label(for="description") Description
+      textarea(id="description" name="description" required)
+    div.form-group
+      label(for="start_date") Date de début
+      input(type="datetime-local" id="start_date" name="start_date" required)
+    div.form-group
+      label(for="end_date") Date de fin
+      input(type="datetime-local" id="end_date" name="end_date" required)
+    div.form-submit
+      button(type="submit") Ajouter
+
+  if flashErrors
+    ul
+      each error in errors
+        li= error

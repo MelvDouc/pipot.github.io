@@ -2,9 +2,7 @@ extends ../base.pug
 
 block main
   h2 Profil de #{user.profile}
-
-  //- TODO navbar
-
+  include ../_inc/user-nav.pug
   div.content
     if flashSucess
       p= flashSuccess

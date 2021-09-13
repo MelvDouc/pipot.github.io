@@ -1,0 +1,16 @@
+div.top
+  h1 PIPOT
+nav.bottom
+  ul
+    li
+      a(href="/accueil") Accueil
+    li
+      a(href="/categories") Catégories
+    li
+      a(href="/evenements") Événements
+    if appUser
+      li
+        a(href="/mon-profil") Mon profil
+    else
+      li
+        a(href="/connexion") Connexion / Inscription
