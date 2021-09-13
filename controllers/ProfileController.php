@@ -6,8 +6,6 @@ use app\models\User;
 use app\core\Controller;
 use app\core\Application;
 use app\core\Request;
-use app\models\forms\users\updateContactForm;
-use app\models\forms\users\UpdatePasswordForm;
 
 class ProfileController extends Controller
 {
@@ -15,15 +13,8 @@ class ProfileController extends Controller
   {
     if (!($user = $this->getSessionUser()))
       return false;
-    $sessionId = (int)$user["id"];
+    $sessionId = $user->id;
     return $param_id === $sessionId;
-  }
-
-  private function getParamUser(int $param_id): array | false
-  {
-    return Application::$instance
-      ->database
-      ->findUserAndRatingById($param_id);
   }
 
   public function profile(Request $request)
@@ -31,25 +22,27 @@ class ProfileController extends Controller
     if (!($id = $request->getParamId()))
       return $this->redirectNotFound();
 
-    if (!($user = $this->getParamUser($id)))
-      return $this->redirectNotFound();
-
+    // if (!($user = $this->getSessionUser()))
+    //   return $this->redirectNotFound();
+    $user = User::findOne(["id" => $id]);
     return $this->render("user/profile", [
+      "title" => "Profil de $user->username",
       "user" => $user,
       "isUserProfile" => $this->isUserProfile($id)
     ]);
   }
 
-  public function my_profile()
+  public function myProfile(Request $request, ?string $flashSuccess = null)
   {
-    if (!($sessionUser = $this->getSessionUser()))
+    if (!$this->getSessionUser())
       return $this->redirectToLogin();
 
-    $user = $this->getParamUser((int)$sessionUser["id"]);
-
+    $user = User::findOne(["id" => $this->getSessionUser()->id]);
     return $this->render("user/profile", [
+      "title" => "Mon profil",
       "user" => $user,
-      "isUserProfile" => true
+      "isUserProfile" => true,
+      "flashSuccess" => $flashSuccess
     ]);
   }
 
@@ -58,35 +51,24 @@ class ProfileController extends Controller
     if (!($user = $this->getSessionUser()))
       return $this->redirectToLogin();
 
-    $id = (int)$user["id"];
-    $form = new UpdatePasswordForm($user);
-
     if ($request->isGet())
       return $this->render("user/update-password", [
-        "form" => $form->createView()
+        "title" => "Modifier mon mot de passe"
       ]);
 
-    $form->setBody($request->getBody());
-    $validation = $form->validate();
+    $body = $request->getBody();
+    $user->setPasswords("old", $body["old-password"] ?? null);
+    $user->setPasswords("new", $body["new-password"] ?? null);
+    $user->setPasswords("confirm", $body["confirm-new-password"] ?? null);
 
-    if ($validation !== 1)
+    if (!$user->isPasswordUpdateValid())
       return $this->render("user/update-password", [
-        "form" => $form->createView(),
-        "error_message" => $validation
+        "title" => "Modifier mon mot de passe",
+        "flashErrors" => $user->getErrors()
       ]);
 
-    if (!Application::$instance
-      ->database
-      ->updatePassword($id, $form->getHashedPassword()))
-      return $this->render("/user-update-password", [
-        "form" => $form->createView(),
-        "error_message" => "Une erreur s'est produite lors de la mise à jour du mot de passe."
-      ]);
-
-    Application::$instance->session->updateUser();
-    return $this->redirect("/mon-profil", "user/profile", [
-      "success_message" => "Votre mot de passe a bien été modifié."
-    ]);
+    $user->updatePassword();
+    return $this->myProfile($request, "Le mot de passe a bien été mis à jour.");
   }
 
   public function updateContact(Request $request)
@@ -94,47 +76,24 @@ class ProfileController extends Controller
     if (!($user = $this->getSessionUser()))
       return $this->redirectToLogin();
 
-    $id = (int)$user["id"];
-    $form = new updateContactForm($this->getSessionUser());
-
     if ($request->isGet())
       return $this->render("user/update-contact", [
-        "form" => $form->createView()
+        "title" => "Modifier mes coordonnées",
+        "user" => $user
       ]);
 
-    $form->setBody($request->getBody());
-    $validation = $form->validate();
+    $body = $request->getBody();
+    $contactProperties = ["first_name", "last_name", "postal_address", "city", "zip_code", "phone_number"];
+    foreach ($contactProperties as $property)
+      $user->{$property} = $body[$property] ?? null;
 
-    if ($validation !== 1)
+    if (!$user->isContactUpdateValid())
       return $this->render("user/update-contact", [
-        "form" => $form->createView(),
-        "error_message" => $validation
+        "title" => "Modifier mes coordonnées",
+        "flashErrors" => $user->getErrors()
       ]);
 
-    if (!Application::$instance
-      ->database
-      ->updateContact($id, $form->getBody()))
-      return $this->render("user/update-contact", [
-        "form" => $form->createView(),
-        "error-message" => "Une erreur s'est produite lors de la mise à jour des coordonnées."
-      ]);
-    Application::$instance
-      ->session
-      ->updateUser();
-    return $this->redirect("/mon-profil", "user/profile");
-  }
-
-  public function my_products()
-  {
-    if (!($user = $this->getSessionUser()))
-      return $this->redirectToLogin();
-
-    $user["products"] = Application::$instance
-      ->database
-      ->findProductsByUserId((int) $user["id"]);
-
-    return $this->render("user/my-products", [
-      "user" => $user,
-    ]);
+    $user->updateContact();
+    return $this->myProfile($request, "Les coordonnées ont bien été mises à jour.");
   }
 }

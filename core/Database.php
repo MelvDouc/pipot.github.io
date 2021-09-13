@@ -121,17 +121,14 @@ class Database
   }
 
   // ===== ===== ===== ===== =====
-  // User
+  // Ratings
   // ===== ===== ===== ===== =====
 
-  public function findUserAndRatingById(int $id): ?array
+  public function findAverageScore(int $rated_id): ?float
   {
-    $columns = "users.id AS id, username, email, role, first_name, last_name, postal_address, city, zip_code, phone_number,
-    is_account_active, image, users.added_at, AVG(score) AS score";
-    $sql = "SELECT $columns FROM users
-    JOIN ratings ON users.id = rated_id
-    WHERE users.id = $id;";
-    return $this->db->query($sql)->fetch();
+    $alias = "average_score";
+    $sql = "SELECT AVG(score) AS $alias FROM ratings WHERE rated_id = $rated_id;";
+    return $this->db->query($sql)->fetch()[$alias];
   }
 
   // ===== ===== ===== ===== =====

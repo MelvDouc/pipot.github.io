@@ -42,13 +42,13 @@ class Controller
 
   protected function isLoggedAsUser(): bool
   {
-    return $this->getSessionUser()
-      && (int)$this->getSessionUser()->role === "USER";
+    if (!$this->getSessionUser()) return false;
+    return $this->getSessionUser()->role === "USER";
   }
 
   protected function isLoggedAsAdmin(): bool
   {
-    return $this->getSessionUser()
-      && (int)$this->getSessionUser()->role === "ADMIN";
+    if (!$this->getSessionUser()) return false;
+    return $this->getSessionUser()->role === "ADMIN";
   }
 }

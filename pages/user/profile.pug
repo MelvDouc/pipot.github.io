@@ -1,10 +1,10 @@
 extends ../base.pug
 
 block main
-  h2 Profil de #{user.profile}
+  h2 Profil de #{user.username}
   include ../_inc/user-nav.pug
   div.content
-    if flashSucess
+    if flashSuccess
       p= flashSuccess
     if isUserProfile
       div.profile-card
@@ -24,11 +24,25 @@ block main
             option(value="5") 5
           button(type="submit") Valider
     ul
-      li= user.username
-      li= user.first_name + " " + user.last_name
-      li= user.postal_address
-      li= user.city
-      li= user.zip_code
-      li= user.phone_number
-      li= user.score
+      - var score = user.getAverageScore()
+      li Note moyenne : #{score ? score : "Pas encore de note"}
       li Membre depuis le #{user.added_at}
+
+    div.coordinates
+      table
+        thead
+          tr
+            th Prénom
+            th Nom
+            th Adresse postale
+            th Ville
+            th Code postal
+            th Numéro de téléphone
+        tbody
+          tr
+            td= user.first_name || "Non renseigné"
+            td= user.last_name || "Non renseigné"
+            td= user.postal_address || "Non renseignée"
+            td= user.city || "Non renseignée"
+            td= user.zip_code || "Non renseigné"
+            td= user.phone_number || "Non renseigné"

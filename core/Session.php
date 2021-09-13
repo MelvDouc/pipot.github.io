@@ -23,8 +23,7 @@ class Session
 
   public function updateUser(): void
   {
-    $currentUserId = (int) $this->getUser()->id;
-    $user = User::findOne(["id" => $currentUserId]);
+    $user = User::findOne(["id" => $this->getUser()->id]);
     $this->setUser($user);
   }
 

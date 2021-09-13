@@ -68,6 +68,13 @@ class User extends Model
       ->findAll("basket", ["*"], ["buyer_id" => $this->id]);
   }
 
+  public function getAverageScore(): ?float
+  {
+    return Application::$instance
+      ->database
+      ->findAverageScore($this->id);
+  }
+
   private function checkUsername(): void
   {
     if (!$this->username) {
@@ -179,6 +186,31 @@ class User extends Model
     $this->checkEmail();
     $this->checkPasswords();
     $this->checkFile();
+    return count($this->errors) === 0;
+  }
+
+  public function isPasswordUpdateValid(): bool
+  {
+    $old = $this->passwords["old"] ?? null;
+    $new = $this->passwords["new"] ?? null;
+    $confirm = $this->passwords["confirm"] ?? null;
+    if (!$old)
+      $this->addError("Veuillez renseigner votre ancien mot de passe.");
+    if (!$new)
+      $this->addError("Veuillez renseigner un nouveau mot de passe.");
+    if (!$confirm)
+      $this->addError("Veuillez confirmer le nouveau mot de passe.");
+    if ($old && !password_verify($old, $this->password))
+      $this->addError("Ancien mot de passe incorrect.");
+    if (!preg_match("/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,25}$/", $new))
+      $this->addError("Le mot de passe doit contenir entre 8 et 25 caractères dont au moins une minuscule, une majuscule et un chiffre.");
+    if ($new && $confirm && $new !== $confirm)
+      $this->addError("Le mot de passe de confirmation ne correspond pas au nouveau mot de passe.");
+    return count($this->errors) === 0;
+  }
+
+  public function isContactUpdateValid(): bool
+  {
     $this->checkContact();
     return count($this->errors) === 0;
   }
@@ -204,22 +236,32 @@ class User extends Model
       );
   }
 
-  public function update(): bool
+  public function updatePassword(): bool
   {
-    $this->saveImage(false);
+    $this->password = $this->passwords["new"];
+    $this->hashPassword();
+    return Application::$instance
+      ->database
+      ->update(
+        self::DB_TABLE,
+        ["password" => $this->password],
+        $this->id
+      );
+  }
+
+  public function updateContact(): bool
+  {
     return Application::$instance
       ->database
       ->update(
         self::DB_TABLE,
         [
-          "password" => $this->password,
           "first_name" => $this->first_name,
           "last_name" => $this->last_name,
           "postal_address" => $this->postal_address,
           "city" => $this->city,
           "zip_code" => $this->zip_code,
           "phone_number" => $this->phone_number,
-          "image" => $this->image
         ],
         $this->id
       );
