@@ -136,17 +136,27 @@ class Product extends Model
   public function update(): bool
   {
     $this->saveImage(false);
-    $values = [
-      "name" => $this->name,
-      "description" => $this->description,
-      "price" => $this->price,
-      "quantity" => $this->quantity,
-      "seller_id" => $this->seller_id,
-      "category_id" => $this->category_id,
-      "image" => $this->image
-    ];
     return Application::$instance
       ->database
-      ->update(self::DB_TABLE, $values, $this->id);
+      ->update(
+        self::DB_TABLE,
+        [
+          "name" => $this->name,
+          "description" => $this->description,
+          "price" => $this->price,
+          "quantity" => $this->quantity,
+          "seller_id" => $this->seller_id,
+          "category_id" => $this->category_id,
+          "image" => $this->image
+        ],
+        $this->id
+      );
+  }
+
+  public function delete(): bool
+  {
+    return Application::$instance
+      ->database
+      ->delete(self::DB_TABLE, $this->id);
   }
 }

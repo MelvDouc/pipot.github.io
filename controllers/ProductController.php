@@ -6,8 +6,7 @@ use app\core\Request;
 use app\models\Product;
 use app\core\Controller;
 use app\core\Application;
-use app\models\forms\products\AddProductForm;
-use app\models\forms\products\UpdateProductForm;
+use app\models\Category;
 
 class ProductController extends Controller
 {
@@ -43,5 +42,94 @@ class ProductController extends Controller
       "product" => $product,
       "addableToBasket" => $this->canBeAddedToBasket($product)
     ]);
+  }
+
+  public function add(Request $request)
+  {
+    if (!($user = $this->getSessionUser()))
+      return $this->redirectToLogin();
+
+    $categories = Category::findAll();
+
+    if ($request->isGet())
+      return $this->render("products/add", [
+        "title" => "Ajouter un article",
+        "categories" => $categories
+      ]);
+
+    $body = $request->getBody();
+    $product = new Product();
+    $product->name = $body["name"] ?? null;
+    $product->description = $body["description"] ?? null;
+    $product->price = (int) $body["price"] ?? null;
+    $product->quantity = (int) $body["quantity"] ?? null;
+    $product->category_id = (int) $body["category_id"] ?? null;
+    $product->seller_id = $user->id;
+    $product->setFile($_FILES["image"] ?? null);
+
+    if (!$product->isValid())
+      return $this->render("products/add", [
+        "title" => "Ajouter un article",
+        "categories" => $categories,
+        "flashErrors" => $product->getErrors()
+      ]);
+
+    $product->save();
+    return $this->redirect("/mes-articles");
+  }
+
+  public function update(Request $request)
+  {
+    if (!($user = $this->getSessionUser()))
+      return $this->redirectToLogin();
+
+    if (!($id = $request->getParamId()))
+      return $this->redirectNotFound();
+
+    if (!($product = Product::findOne(["id" => $id])))
+      return $this->redirectNotFound();
+
+    $categories = Category::findAll();
+
+    if ($request->isGet())
+      return $this->render("products/update", [
+        "title" => "Modifier un article",
+        "categories" => $categories,
+        "product" => $product
+      ]);
+
+    $body = $request->getBody();
+    $product->name = $body["name"] ?? null;
+    $product->description = $body["description"] ?? null;
+    $product->price = (int) $body["price"] ?? null;
+    $product->quantity = (int) $body["quantity"] ?? null;
+    $product->category_id = (int) $body["category_id"] ?? null;
+    $product->seller_id = $user->id;
+    $product->setFile($_FILES["image"] ?? null);
+
+    if (!$product->isValid())
+      return $this->render("products/update", [
+        "title" => "Modifier un article",
+        "categories" => $categories,
+        "flashErrors" => $product->getErrors()
+      ]);
+
+    $product->update();
+    return $this->redirect("/mes-articles");
+  }
+
+  public function delete(Request $request)
+  {
+    if (!$this->getSessionUser())
+      return $this->redirectToLogin();
+
+    if (!($id = $request->getParamId()))
+      return $this->redirectNotFound();
+
+    if (!($product = Product::findOne(["id" => $id])))
+      return $this->redirectNotFound();
+
+    $product->delete();
+    return $this->redirect("/mes-articles");
   }
 }

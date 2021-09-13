@@ -267,6 +267,20 @@ class User extends Model
       );
   }
 
+  public function activateAcouunt(): bool
+  {
+    return Application::$instance
+      ->database
+      ->update(
+        self::DB_TABLE,
+        [
+          "is_account_active" => 1,
+          "verification_string" => null
+        ],
+        $this->id
+      );
+  }
+
   public function sendConfirmation(): void
   {
     $email = new Email($this->email, $this->username, "Confirmation de création de compte");

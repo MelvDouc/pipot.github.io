@@ -1,7 +1,7 @@
 extends ../base.pug
 
 block main
-  h2 Ajouter un article
+  h2= title
   div.content
     form(method="POST" action="/ajouter-article" enctype="multipart/form-data")
       div.form-group
@@ -16,6 +16,11 @@ block main
       div.form-group
         label(for="quantity") Quantité
         input(type="number" min="1" name="quantity" id="quantity" required)
+      div.form-select
+        label(for="category_id") Catégorie
+        select(id="category_id" name="category_id")
+          each category in categories
+            option(value= category.id) #{category.name}
       div.form-group
         label(for="image") Image
         input(type="file" name="image" id="image")

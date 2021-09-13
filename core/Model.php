@@ -5,8 +5,8 @@ namespace app\core;
 abstract class Model
 {
   public const DB_TABLE = self::DB_TABLE;
-  public const ALLOWED_FILE_TYPES = ["image/jpeg", "image/png", "image/jpeg", "image/gif"];
-  protected ?array $files;
+  public const ALLOWED_FILE_TYPES = ["image/png", "image/jpeg", "image/gif"];
+  protected ?array $file;
   protected array $errors;
 
   protected function addError(string $error): void

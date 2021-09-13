@@ -3,7 +3,6 @@
 namespace app\controllers;
 
 use app\core\Controller;
-use app\core\Application;
 use app\core\Request;
 use app\models\User;
 
@@ -11,8 +10,8 @@ class RegisterController extends Controller
 {
   public function register(Request $request)
   {
-    if (Application::$instance->session->hasUser())
-      return $this->redirectHome();
+    if ($this->getSessionUser())
+      return $this->redirect("/mon-profil");
 
     if ($request->isGet())
       return $this->render("registration/index", [
@@ -25,11 +24,12 @@ class RegisterController extends Controller
         "flashErrors" => ["Veuillez accepter les conditions d'utilisation."]
       ]);
 
+    $body = $request->getBody();
     $user = new User();
-    $user->username = $_POST["username"] ?? null;
-    $user->email = $_POST["email"] ?? null;
-    $user->setPasswords("plain", $_POST["password"] ?? null);
-    $user->setPasswords("confirm", $_POST["confirm-password"] ?? null);
+    $user->username = $body["username"] ?? null;
+    $user->email = $body["email"] ?? null;
+    $user->setPasswords("plain", $body["password"] ?? null);
+    $user->setPasswords("confirm", $body["confirm-password"] ?? null);
 
     if (!$user->isValid())
       return $this->render("register/index", [
@@ -49,8 +49,8 @@ class RegisterController extends Controller
     if (!$verification_string)
       return $this->redirectHome();
 
-    if (!Application::$instance->database->activateAccount($verification_string))
-      return $this->redirectHome();
+    $user = User::findOne(["verification_string" => $verification_string]);
+    $user->activateAcouunt();
     return $this->render("registration/verification");
   }
 }
