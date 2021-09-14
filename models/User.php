@@ -65,7 +65,43 @@ class User extends Model
   {
     return Application::$instance
       ->database
-      ->findAll("basket", ["*"], ["buyer_id" => $this->id]);
+      ->findBasket($this->id);
+  }
+
+  public function hasInBasket(Product $product): bool
+  {
+    $basket = $this->getBasket();
+    if (!$basket) return false;
+    foreach ($basket as $basketItem)
+      if ($basketItem->product_id === $product->id)
+        return true;
+    return false;
+  }
+
+  public function addToBasket(Product $product): bool
+  {
+    return Application::$instance
+      ->database
+      ->add(
+        "basket",
+        [
+          "product_id" => $product->id,
+          "buyer_id" => $this->id
+        ]
+      );
+  }
+
+  public function removeFromBasket(Product $product): bool
+  {
+    return Application::$instance
+      ->database
+      ->delete(
+        "basket",
+        [
+          "product_id" => $product->id,
+          "buyer_id" => $this->id
+        ]
+      );
   }
 
   public function getAverageScore(): ?float
@@ -191,6 +227,7 @@ class User extends Model
 
   public function isPasswordUpdateValid(): bool
   {
+    $this->errors = [];
     $old = $this->passwords["old"] ?? null;
     $new = $this->passwords["new"] ?? null;
     $confirm = $this->passwords["confirm"] ?? null;
@@ -203,7 +240,7 @@ class User extends Model
     if ($old && !password_verify($old, $this->password))
       $this->addError("Ancien mot de passe incorrect.");
     if (!preg_match("/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,25}$/", $new))
-      $this->addError("Le mot de passe doit contenir entre 8 et 25 caractères dont au moins une minuscule, une majuscule et un chiffre.");
+      $this->addError("Le nouveau mot de passe doit contenir entre 8 et 25 caractères dont au moins une minuscule, une majuscule et un chiffre.");
     if ($new && $confirm && $new !== $confirm)
       $this->addError("Le mot de passe de confirmation ne correspond pas au nouveau mot de passe.");
     return count($this->errors) === 0;
@@ -211,6 +248,7 @@ class User extends Model
 
   public function isContactUpdateValid(): bool
   {
+    $this->errors = [];
     $this->checkContact();
     return count($this->errors) === 0;
   }

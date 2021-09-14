@@ -112,11 +112,17 @@ class Database
     return $statement->execute();
   }
 
-  public function delete(string $table, int $id): bool
+  public function delete(string $table, array $values): bool
   {
-    $sql = "DELETE FROM $table WHERE id = ?;";
+    $placeholdersArray = array_map(fn ($col) => "$col = ?", array_keys($values));
+    $placeholders = implode(" AND ", $placeholdersArray);
+    $sql = "DELETE FROM $table WHERE $placeholders";
     $statement = $this->db->prepare($sql);
-    $statement->bindValue(1, $id);
+    $i = 1;
+    foreach ($values as $value) {
+      $statement->bindValue($i, $value);
+      $i++;
+    }
     return $statement->execute();
   }
 
@@ -134,61 +140,6 @@ class Database
   // ===== ===== ===== ===== =====
   // Product
   // ===== ===== ===== ===== =====
-
-  public function findProductById(int $id): array | false
-  {
-    $sql = "SELECT
-    products.id AS id, products.name, products.description, products.price,
-    products.quantity, products.seller_id, users.username AS seller, products.category_id,
-    products.image, categories.name AS category, products.added_at
-    FROM `products`
-    JOIN users ON seller_id = users.id
-    JOIN categories ON category_id = categories.id
-    WHERE products.id = $id
-    ORDER BY added_at DESC;";
-    return $this->db->query($sql)->fetch();
-  }
-
-  public function findAllProducts(): array | false
-  {
-    $sql = "SELECT products.id, products.name, products.description, price, quantity, seller_id,
-    users.username AS seller, category_id, categories.name AS category, image, products.added_at
-    FROM products
-    JOIN users ON users.id = seller_id
-    JOIN categories ON categories.id = category_id
-    ORDER BY products.id";
-    return $this->db->query($sql)->fetchAll();
-  }
-
-  public function findProductsByUserId(int $id): array | false
-  {
-    $sql = "SELECT
-    products.id, products.name, products.description, price, quantity, seller_id,
-    category_id, categories.name AS category, image, products.added_at
-    FROM `products`
-    JOIN categories ON category_id = categories.id
-    WHERE seller_id = $id;";
-    return $this->db->query($sql)->fetchAll();
-  }
-
-  public function findCategoryProducts(int $category_id): array | false
-  {
-    $sql = "SELECT
-    products.id AS id,
-    products.name AS name,
-    description,
-    price,
-    quantity,
-    seller_id,
-    users.username AS seller,
-    image,
-    added_at
-    FROM products
-    JOIN users ON users.id = seller_id
-    WHERE category_id = $category_id
-    ORDER BY added_at DESC;";
-    return $this->db->query($sql)->fetchAll();
-  }
 
   public function findProductByKeywords(string $keywords): ?array
   {
@@ -214,11 +165,23 @@ class Database
   // Basket
   // ===== ===== ===== ===== =====
 
-  public function getBasket(int $user_id): array | false
+  public function findBasket(int $user_id): array | false
   {
-    $columns = "basket.id AS basket_id, product_id, products.name AS name, products.description,
-    price, quantity, image, products.category_id, categories.name AS category,
-    basket.seller_id, users.username AS seller_username, products.added_at";
+    $columnsArray = [
+      "basket.id AS basket_id",
+      "basket.product_id",
+      "basket.seller_id",
+      "products.name AS name",
+      "products.description",
+      "products.price",
+      "products.quantity",
+      "products.image",
+      "products.category_id",
+      "products.added_at",
+      "categories.name AS category",
+      "users.username AS seller",
+    ];
+    $columns = implode(", ", $columnsArray);
     $sql = "SELECT $columns
     FROM basket
     JOIN products ON basket.product_id = products.id

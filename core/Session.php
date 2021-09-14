@@ -21,12 +21,6 @@ class Session
     $_SESSION["user"] = $user;
   }
 
-  public function updateUser(): void
-  {
-    $user = User::findOne(["id" => $this->getUser()->id]);
-    $this->setUser($user);
-  }
-
   public function hasUser(): bool
   {
     return array_key_exists("user", $_SESSION);
@@ -35,5 +29,20 @@ class Session
   public function removeUser(): void
   {
     unset($_SESSION["user"]);
+  }
+
+  public function getFlash(string $key): string|array|null
+  {
+    return $_SESSION["flash-$key"] ?? null;
+  }
+
+  public function setFlash(string $key, string|array $messages): void
+  {
+    $_SESSION["flash-$key"] = $messages;
+  }
+
+  public function removeFlash(string $key): void
+  {
+    unset($_SESSION["flash-$key"]);
   }
 }

@@ -5,104 +5,60 @@ namespace app\controllers;
 use app\core\Request;
 use app\core\Controller;
 use app\core\Application;
+use app\models\Product;
 
 class BasketController extends Controller
 {
-  private function isInBasket(int $user_id, int $product_id): bool
-  {
-    return (bool) Application::$instance
-      ->database
-      ->findOne("basket", ["*"], [
-        "product_id" => $product_id,
-        "buyer_id" => $user_id
-      ]);
-  }
-
-  private function redirectWithError($error_message)
-  {
-    return $this->redirect("/mon-panier", "user/my-basket", [
-      "error_message" => $error_message,
-      "user" => $this->getSessionUser()
-    ]);
-  }
-
-  private function redirectWithSuccess($success_message)
-  {
-    return $this->redirect("/mon-panier", "user/my-basket", [
-      "success_message" => $success_message,
-      "user" => $this->getSessionUser()
-    ]);
-  }
-
-  public function my_basket()
+  public function myBasket()
   {
     if (!($user = $this->getSessionUser()))
       return $this->redirectToLogin();
 
-    $user["basket"] = Application::$instance
-      ->database
-      ->getBasket((int)$user["id"]);
-
     return $this->render("user/my-basket", [
+      "title" => "Mon panier",
       "user" => $user,
+      "flashSuccess" => $this->getFlash("success"),
+      "flashErrors" => $this->getFlash("errors")
     ]);
   }
 
   public function add(Request $request)
   {
-    $id = $request->getParamId();
-    if (!$id)
-      return $this->redirectNotFound();
-
     if (!($user = $this->getSessionUser()))
       return $this->redirectToLogin();
 
-    $product = Application::$instance
-      ->database
-      ->findProductById($id);
+    if (!($id = $request->getParamId()))
+      return $this->redirectNotFound();
 
-    if (!$product)
-      return $this->redirectWithError("L'article n'existe pas.");
+    $product = Product::findOne(["id" => $id]);
 
-    if ($this->isInBasket((int)$user["id"], $id))
-      return $this->redirectWithError("Cet article est déjà dans votre panier.");
+    if (!$product || $product->seller_id === $user->id || $user->hasInBasket($product)) {
+      $this->setFlash("errors", ["Impossible d'ajouter cet article à votre panier."]);
+      return $this->myBasket();
+    }
 
-    $user = $this->getSessionUser();
-    $add = Application::$instance
-      ->database
-      ->addToBasket($product, (int)$user["id"]);
-
-    if (!$add)
-      return $this->redirectWithError("Une erreur s'est produite lors de l'ajout de l'article au panier.");
-
-    return $this->redirectWithSuccess("L'article a bien été ajouté au panier.");
+    $user->addToBasket($product);
+    $this->setFlash("success", "L'article a été ajouté au panier.");
+    return $this->myBasket();
   }
 
   public function delete(Request $request)
   {
-
     if (!($user = $this->getSessionUser()))
       return $this->redirectToLogin();
 
-    $basket_id = $request->getParamId();
-    if (!$basket_id)
+    if (!($id = $request->getParamId()))
       return $this->redirectNotFound();
 
-    if (!($basketProduct = Application::$instance->database->findOne("basket", ["*"], ["id" => $basket_id])))
-      return $this->redirectNotFound();
+    $product = Product::findOne(["id" => $id]);
 
-    $user_id = (int) $user["id"];
+    if (!$product || !$user->hasInBasket($product)) {
+      $this->setFlash("errors", ["Impossible de retirer cet article de votre panier."]);
+      return $this->myBasket();
+    }
 
-    if ((int)$basketProduct["buyer_id"] !== $user_id)
-      return $this->redirectWithError("Cet article n'est pas dans votre panier.");
-
-    $deletion = Application::$instance
-      ->database
-      ->deleteFromBasket($basket_id);
-
-    if (!$deletion)
-      return $this->redirectWithError("Une erreur s'est produite lors de la suppression de l'article.");
-
-    return $this->redirectWithSuccess("L'article a bien été supprimé du panier.");
+    $user->removeFromBasket($product);
+    $this->setFlash("success", "L'article a été retiré panier.");
+    return $this->myBasket();
   }
 }

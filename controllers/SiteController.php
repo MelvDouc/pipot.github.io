@@ -9,7 +9,9 @@ class SiteController extends Controller
   public function home()
   {
     return $this->render("home/home", [
-      "title" => "Accueil"
+      "title" => "Accueil",
+      "flashSuccess" => $this->getFlash("success"),
+      "flashErrors" => $this->getFlash("errors")
     ]);
   }
 }

@@ -22,8 +22,6 @@ class ProfileController extends Controller
     if (!($id = $request->getParamId()))
       return $this->redirectNotFound();
 
-    // if (!($user = $this->getSessionUser()))
-    //   return $this->redirectNotFound();
     $user = User::findOne(["id" => $id]);
     return $this->render("user/profile", [
       "title" => "Profil de $user->username",
@@ -32,17 +30,16 @@ class ProfileController extends Controller
     ]);
   }
 
-  public function myProfile(Request $request, ?string $flashSuccess = null)
+  public function myProfile()
   {
-    if (!$this->getSessionUser())
+    if (!($user = $this->getSessionUser()))
       return $this->redirectToLogin();
 
-    $user = User::findOne(["id" => $this->getSessionUser()->id]);
     return $this->render("user/profile", [
       "title" => "Mon profil",
       "user" => $user,
       "isUserProfile" => true,
-      "flashSuccess" => $flashSuccess
+      "flashSuccess" => $this->getFlash("success")
     ]);
   }
 
@@ -68,7 +65,8 @@ class ProfileController extends Controller
       ]);
 
     $user->updatePassword();
-    return $this->myProfile($request, "Le mot de passe a bien été mis à jour.");
+    $this->setFlash("success", "Le mot de passe a bien été mis à jour.");
+    return $this->redirect("/mon-profil");
   }
 
   public function updateContact(Request $request)
@@ -90,10 +88,12 @@ class ProfileController extends Controller
     if (!$user->isContactUpdateValid())
       return $this->render("user/update-contact", [
         "title" => "Modifier mes coordonnées",
+        "user" => $user,
         "flashErrors" => $user->getErrors()
       ]);
 
     $user->updateContact();
-    return $this->myProfile($request, "Les coordonnées ont bien été mises à jour.");
+    $this->setFlash("success", "Les coordonnées ont bien été mises à jour.");
+    return $this->redirect("/mon-profil");
   }
 }

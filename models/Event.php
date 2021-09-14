@@ -116,6 +116,6 @@ class Event extends Model
   {
     return Application::$instance
       ->database
-      ->delete(self::DB_TABLE, $this->id);
+      ->delete(self::DB_TABLE, ["id" => $this->id]);
   }
 }

@@ -51,4 +51,16 @@ class Controller
     if (!$this->getSessionUser()) return false;
     return $this->getSessionUser()->role === "ADMIN";
   }
+
+  protected function getFlash($key): string|array|null
+  {
+    $flash = Application::$instance->session->getFlash($key);
+    Application::$instance->session->removeFlash($key);
+    return $flash;
+  }
+
+  protected function setFlash(string $key, string|array $messages): void
+  {
+    Application::$instance->session->setFlash($key, $messages);
+  }
 }

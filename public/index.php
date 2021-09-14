@@ -37,7 +37,7 @@ $app->post("/modifier-article", [ProductController::class, "update"]);
 $app->post("/supprimer-article", [ProductController::class, "delete"]);
 
 // Panier
-$app->get("/mon-panier", [BasketController::class, "my_basket"]);
+$app->get("/mon-panier", [BasketController::class, "myBasket"]);
 $app->post("/ajouter-au-panier", [BasketController::class, "add"]);
 $app->post("/supprimer-du-panier", [BasketController::class, "delete"]);
 
@@ -52,7 +52,7 @@ $app->post("/connexion", [AuthController::class, "login"]);
 $app->post("/deconnexion", [AuthController::class, "logout"]);
 
 // Profil
-$app->get("/mon-profil", [ProfileController::class, "my_profile"]);
+$app->get("/mon-profil", [ProfileController::class, "myProfile"]);
 $app->get("/profil", [ProfileController::class, "profile"]);
 $app->get("/modifier-mon-mot-de-passe", [ProfileController::class, "updatePassword"]);
 $app->post("/modifier-mon-mot-de-passe", [ProfileController::class, "updatePassword"]);
