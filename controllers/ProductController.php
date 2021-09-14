@@ -65,7 +65,8 @@ class ProductController extends Controller
     $product->quantity = (int) $body["quantity"] ?? null;
     $product->category_id = (int) $body["category_id"] ?? null;
     $product->seller_id = $user->id;
-    $product->setFile($_FILES["image"] ?? null);
+    if (isset($_FILES["image"]) && $_FILES["image"]["name"])
+      $product->setFile($_FILES["image"] ?? null);
 
     if (!$product->isValid())
       return $this->render("products/add", [

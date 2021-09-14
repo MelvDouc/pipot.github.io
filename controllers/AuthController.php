@@ -19,14 +19,19 @@ class AuthController extends Controller
 
   public function login(Request $request)
   {
-    if ($this->getSessionUser())
+    if ($this->getSessionUser()) {
       $this->setFlash("errors", ["Vous êtes déjà connecté."]);
-    return $this->redirectHome();
+      return $this->redirectHome();
+    }
 
     if ($request->isGet())
       return $this->get();
 
-    $uuid = $_POST["uuid"] ?? null;
+    if (!($uuid = $_POST["uuid"] ?? null)) {
+      $this->setFlash("errors", ["Veuillez renseigner vos identifiants."]);
+      return $this->get();
+    }
+
     $user = User::findOne(["username" => $uuid, "email" => $uuid], "OR");
 
     if (!$user) {
@@ -40,13 +45,13 @@ class AuthController extends Controller
       return $this->get();
     }
 
-    Application::$instance->session->setUser($user);
-    return $this->redirect("mon-profil");
+    Application::$instance->session->setUserId($user->id);
+    return $this->redirect("/mon-profil");
   }
 
   public function logout()
   {
-    Application::$instance->session->removeUser();
+    Application::$instance->session->removeUserId();
     return $this->redirectHome();
   }
 }

@@ -6,7 +6,7 @@ abstract class Model
 {
   public const DB_TABLE = self::DB_TABLE;
   public const ALLOWED_FILE_TYPES = ["image/png", "image/jpeg", "image/gif"];
-  protected ?array $file;
+  protected ?array $file = null;
   protected array $errors = [];
 
   protected function addError(string $error): void

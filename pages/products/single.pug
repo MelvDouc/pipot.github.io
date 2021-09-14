@@ -18,12 +18,12 @@ block main
             dd= product.quantity
             dt Publié par
             dd
-              a(href=`/profil/${product.seller_id}`)= product.seller
+              a(href=`/profil/${product.seller_id}`)= product.getSellerUsername()
             dt Publié le
             dd= product.added_at
             dt Catégorie
             dd
-              a(href=`/categories/${product.category_id}`)= product.category
+              a(href=`/categories/${product.category_id}`)= product.getCategoryName()
     if addableToBasket
       form(method="POST" action=`/ajouter-au-panier/${product.id}`)
         button.button(type="submit") Ajouter

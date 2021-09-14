@@ -58,7 +58,7 @@ $app->get("/modifier-mon-mot-de-passe", [ProfileController::class, "updatePasswo
 $app->post("/modifier-mon-mot-de-passe", [ProfileController::class, "updatePassword"]);
 $app->get("/modifier-mes-coordonnees", [ProfileController::class, "updateContact"]);
 $app->post("/modifier-mes-coordonnees", [ProfileController::class, "updateContact"]);
-$app->get("/mes-articles", [ProfileController::class, "my_products"]);
+$app->get("/mes-articles", [ProfileController::class, "myProducts"]);
 
 // Messages
 $app->get("/messagerie", [MessageController::class, "my_messages"]);

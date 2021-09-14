@@ -53,13 +53,7 @@ class Router
 
   public function renderView(string $view, array $params = [])
   {
-    // $loader = new \Twig\Loader\FilesystemLoader(Application::$ROOT_DIR  . "/pages");
-    // $twig = new \Twig\Environment($loader);
-    // $twig->addExtension(new StringExtension());
-    // $appUser = Application::$instance->session->getUser();
-    // $twig->addGlobal("appUser", $appUser);
-
-    // echo $twig->render("$view.html.twig", $params);
+    $params["isUserLoggedIn"] = Application::$instance->session->hasUser();
     $path = Application::$ROOT_DIR . "/pages";
     $this->viewEngine->displayFile("$path/$view.pug", $params);
   }

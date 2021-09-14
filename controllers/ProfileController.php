@@ -4,7 +4,6 @@ namespace app\controllers;
 
 use app\models\User;
 use app\core\Controller;
-use app\core\Application;
 use app\core\Request;
 
 class ProfileController extends Controller
@@ -40,6 +39,19 @@ class ProfileController extends Controller
       "user" => $user,
       "isUserProfile" => true,
       "flashSuccess" => $this->getFlash("success")
+    ]);
+  }
+
+  public function myProducts()
+  {
+    if (!($user = $this->getSessionUser()))
+      return $this->redirectToLogin();
+
+    return $this->render("user/my-products", [
+      "title" => "Mes articles",
+      "user" => $user,
+      "flashSuccess" => $this->getFlash("success"),
+      "flashErrors" => $this->getFlash("errors")
     ]);
   }
 

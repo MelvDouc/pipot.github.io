@@ -37,7 +37,9 @@ class Controller
 
   protected function getSessionUser(): ?User
   {
-    return Application::$instance->session->getUser();
+    $userId = Application::$instance->session->getUserId();
+    if (!$userId) return null;
+    return User::findOne(["id" => $userId]);
   }
 
   protected function isLoggedAsUser(): bool

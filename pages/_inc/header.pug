@@ -8,7 +8,7 @@ nav.bottom
       a(href="/categories") Catégories
     li
       a(href="/evenements") Événements
-    if appUser
+    if isUserLoggedIn
       li
         a(href="/mon-profil") Mon profil
     else

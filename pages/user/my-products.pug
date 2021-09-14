@@ -4,7 +4,7 @@ block main
   h2 Articles de #{user.username}
   div.content
     ul
-      each product in user.products
+      each product in user.getProducts()
         li
           div.product-card
             section.left
@@ -21,11 +21,11 @@ block main
                   dt Quantité disponible
                   dd= product.quantity
                   dt Catégorie
-                  dd= product.category
+                  dd= product.getCategoryName()
                   dt Publié le
                   dd= product.added_at
               div.actions
                 button.button
                   a(href=`/modifier-article/${product.id}`) Modifier
-                  form(method="POST" action=`/supprimer-article/${product.id}`)
-                    input(type="submit" value="Supprimer")
+                form(method="POST" action=`/supprimer-article/${product.id}`)
+                  input(type="submit" value="Supprimer")

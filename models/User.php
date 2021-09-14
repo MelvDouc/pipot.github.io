@@ -104,6 +104,11 @@ class User extends Model
       );
   }
 
+  public function getProducts(): ?array
+  {
+    return Product::findAll(["seller_id" => $this->id]);
+  }
+
   public function getAverageScore(): ?float
   {
     return Application::$instance

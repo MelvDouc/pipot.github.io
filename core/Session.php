@@ -11,24 +11,24 @@ class Session
     session_start();
   }
 
-  public function getUser(): ?User
+  public function getUserId(): ?int
   {
-    return $_SESSION["user"] ?? null;
+    return $_SESSION["user-id"] ?? null;
   }
 
-  public function setUser(User $user): void
+  public function setUserId(int $userId): void
   {
-    $_SESSION["user"] = $user;
+    $_SESSION["user-id"] = $userId;
   }
 
   public function hasUser(): bool
   {
-    return array_key_exists("user", $_SESSION);
+    return array_key_exists("user-id", $_SESSION);
   }
 
-  public function removeUser(): void
+  public function removeUserId(): void
   {
-    unset($_SESSION["user"]);
+    unset($_SESSION["user-id"]);
   }
 
   public function getFlash(string $key): string|array|null
