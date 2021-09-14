@@ -39,6 +39,7 @@ class ProductController extends Controller
       return $this->redirectNotFound();
 
     return $this->render("products/single", [
+      "title" => $product->name,
       "product" => $product,
       "addableToBasket" => $this->canBeAddedToBasket($product)
     ]);
@@ -132,5 +133,24 @@ class ProductController extends Controller
 
     $product->delete();
     return $this->redirect("/mes-articles");
+  }
+
+  public function search(Request $request)
+  {
+    $body = $request->getBody();
+    $keywords = $body["keywords"] ?? null;
+
+    if (!$keywords) return $this->redirectHome();
+
+    $dbProducts = Application::$instance
+      ->database
+      ->findProductByKeywords($keywords);
+    $products = array_map(fn ($dbProd) => Product::instantiate($dbProd), $dbProducts);
+
+    return $this->render("/products/search", [
+      "title" => "Résultats de la recherche",
+      "products" => $products,
+      "search" => $keywords
+    ]);
   }
 }

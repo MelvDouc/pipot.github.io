@@ -146,12 +146,9 @@ class Database
     $array = explode(" ", $keywords);
     $result = [];
     foreach ($array as $keyword) {
-      $sql = "SELECT products.id, products.name, products.description, price, quantity, seller_id,
-      users.username AS seller, category_id, categories.name AS category, image, products.added_at
-      FROM products
-      JOIN users ON users.id = seller_id
-      JOIN categories ON categories.id = category_id
-      WHERE products.name LIKE '%$keyword%' OR products.description LIKE '%$keyword%';";
+      $sql = "SELECT * FROM products
+      WHERE products.name LIKE '%$keyword%'
+      OR products.description LIKE '%$keyword%';";
       $products = $this->db->query($sql)->fetchAll();
       if (!$products) continue;
       foreach ($products as $product)
@@ -165,16 +162,16 @@ class Database
   // Basket
   // ===== ===== ===== ===== =====
 
-  public function findBasket(int $user_id): array | false
+  public function findBasket(int $user_id): ?array
   {
     $columnsArray = [
       "basket.id AS basket_id",
       "basket.product_id",
-      "basket.seller_id",
       "products.name AS name",
       "products.description",
       "products.price",
       "products.quantity",
+      "products.seller_id",
       "products.image",
       "products.category_id",
       "products.added_at",
@@ -185,7 +182,7 @@ class Database
     $sql = "SELECT $columns
     FROM basket
     JOIN products ON basket.product_id = products.id
-    JOIN users ON basket.seller_id = users.id
+    JOIN users ON products.seller_id = users.id
     JOIN categories ON products.category_id = categories.id
     WHERE buyer_id = $user_id;";
     return $this->db->query($sql)->fetchAll();

@@ -44,3 +44,25 @@ $silver-gradient1: linear-gradient(315deg, $silver1 0%, $silver2 74%);
     transform: scale(.975);
   }
 }
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+
+  99% {
+    opacity: 0;
+    width: initial;
+    height: initial;
+  }
+
+  100% {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+}
+
+.flash {
+  animation: fadeOut 2s 7s forwards;
+}

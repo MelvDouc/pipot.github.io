@@ -73,7 +73,7 @@ class User extends Model
     $basket = $this->getBasket();
     if (!$basket) return false;
     foreach ($basket as $basketItem)
-      if ($basketItem->product_id === $product->id)
+      if ((int) $basketItem["product_id"] === $product->id)
         return true;
     return false;
   }

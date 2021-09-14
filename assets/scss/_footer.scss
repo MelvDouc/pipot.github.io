@@ -1,3 +1,29 @@
 footer {
+  background: #333;
+  color: white;
   margin-top: auto;
+  display: grid;
+  grid-template-rows: 3fr 1fr;
+  
+  .bottom div {
+    display: flex;
+    justify-content: center;
+
+    form {
+      min-width: 50%;
+      justify-content: center;
+      align-items: center;
+      gap: .5em;
+      padding: .5em;
+
+      input[type="search"] {
+        height: 2em;
+        width: 100%;
+      }
+
+      .button {
+        background: $blue1;
+      }
+    }
+  }
 }

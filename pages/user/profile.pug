@@ -5,7 +5,7 @@ block main
   include ../_inc/user-nav.pug
   div.content
     if flashSuccess
-      p= flashSuccess
+      p.flash= flashSuccess
     if isUserProfile
       div.profile-card
         a(href="/modifier-mon-mot-de-passe") Modifier mon mot de passe

@@ -18,7 +18,7 @@ class Product extends Model
   public string $image;
   public string $added_at;
 
-  private static function instantiate(array $dbProduct): Product
+  public static function instantiate(array $dbProduct): Product
   {
     $product = new Product();
     $product->id = (int) $dbProduct["id"];

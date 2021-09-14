@@ -5,7 +5,7 @@ html(lang="fr")
     meta(meta http-equiv="X-UA-Compatible" content="IE=edge") 
     meta(name="viewport" content="width=device-width, initial-scale=1.0")
     link(rel="icon" type="image/x-icon" href="/favicon.ico")
-    link(rel="stylesheet" href="/build/css/style.css")
+    link(rel="stylesheet" type="text/css" href="/build/css/style.css")
     script(src="/build/js/main.js" type="module")
     title PIPOT - #{title}
   body
@@ -14,7 +14,10 @@ html(lang="fr")
     main
       block main
     footer
-      h2 Rechercher un article
-      form(method="POST" action="/recherche")
-        input(type="search" name="keywords" placeholder="Séparez chaque mot-clé par un espace...")
-        button Rechercher
+      section.top
+      section.bottom
+        h2 Rechercher un article
+        div
+          form(method="POST" action="/recherche")
+            input(type="search" name="keywords" placeholder="Séparez chaque mot-clé par un espace...")
+            button.button Rechercher

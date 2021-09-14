@@ -4,7 +4,6 @@ namespace app\controllers;
 
 use app\core\Request;
 use app\core\Controller;
-use app\core\Application;
 use app\models\Product;
 
 class BasketController extends Controller
@@ -34,12 +33,12 @@ class BasketController extends Controller
 
     if (!$product || $product->seller_id === $user->id || $user->hasInBasket($product)) {
       $this->setFlash("errors", ["Impossible d'ajouter cet article à votre panier."]);
-      return $this->myBasket();
+      return $this->redirect("/mon-panier");
     }
 
     $user->addToBasket($product);
     $this->setFlash("success", "L'article a été ajouté au panier.");
-    return $this->myBasket();
+    return $this->redirect("/mon-panier");
   }
 
   public function delete(Request $request)
@@ -54,11 +53,11 @@ class BasketController extends Controller
 
     if (!$product || !$user->hasInBasket($product)) {
       $this->setFlash("errors", ["Impossible de retirer cet article de votre panier."]);
-      return $this->myBasket();
+      return $this->redirect("/mon-panier");
     }
 
     $user->removeFromBasket($product);
     $this->setFlash("success", "L'article a été retiré panier.");
-    return $this->myBasket();
+    return $this->redirect("/mon-panier");
   }
 }

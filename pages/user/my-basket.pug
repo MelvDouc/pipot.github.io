@@ -5,16 +5,16 @@ block main
   include ../_inc/user-nav.pug
   div.content
     if flashSuccess
-      p= flashSuccess
+      p.flash= flashSuccess
     if flashErrors
       ul
         each error in flashErrors
          li= error
     if !user.getBasket()
       p Votre panier est vide. Vous pouvez jeter un oeil à la #[a(href="/categories") page des catégories] et ajouter les articles qui vous intéressent.
-    ul
-      each product in user.getBasket()
-        li
+    else
+      div.product-container
+        each product in user.getBasket()
           div.product-card
             section.left
               img(src="/build/img/products/" + product.image alt=product.name)
@@ -29,12 +29,12 @@ block main
                   dd= product.price
                   dt Vendu par
                   dd
-                    a(href=`/profil/${product.seller_id}`) #{product.seller}
+                    a(href=`/profil/${product.seller_id}`)= product.seller
                   dt Catégorie
                   dd
-                    a(href=`/profil/${product.category_id}`) #{product.category}
+                    a(href=`/profil/${product.category_id}`)= product.category
                   dt Publié le
                   dd= product.added_at
               div.actions
-                form(method="POST" action=`/suprrimer-du-panier/${product.basket_id}`)
+                form(method="POST" action=`/supprimer-du-panier/${product.product_id}`)
                   button.button(type="submit") Supprimer

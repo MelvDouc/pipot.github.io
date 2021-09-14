@@ -1,9 +1,9 @@
 extends ../base.pug
 
 block main
-  h2 Résultats de la recherche
+  h2= title
   div.content
-    p Recherche : #[strong= search]
+    p#search-query Recherche : #[strong= search]
     if products
       ul
         each product in products
@@ -24,7 +24,10 @@ block main
                     dd= product.quantity
                     dt Vendu par
                     dd
-                      a(href=`/profil/${product.seller_id}`)= product.seller
+                      a(href=`/profil/${product.seller_id}`)= product.getSellerUsername()
+                    dt Catégorie
+                    dd
+                      a(href=`/categories/${product.category_id}`)= product.getCategoryName()
                     dt Publié le
                     dd= product.added_at
     else
