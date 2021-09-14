@@ -4,26 +4,28 @@ block main
   h2= title
   div.content
     form(method="POST" action="/ajouter-article" enctype="multipart/form-data")
-      div.form-group
+      div.form-text
         label(for="name") Nom de l'article
         input(type="text" name="name" id="name" maxlength="50" required)
-      div.form-group
-        label(for="description")
+      div.form-text
+        label(for="description") Description
         textarea(id="description" name="description")
-      div.form-group
-        label(for="price") Prix en Pipots
-        input(type="number" min="1" name="price" id="price" required)
-      div.form-group
-        label(for="quantity") Quantité
-        input(type="number" min="1" name="quantity" id="quantity" required)
-      div.form-select
-        label(for="category_id") Catégorie
-        select(id="category_id" name="category_id")
-          each category in categories
-            option(value= category.id) #{category.name}
-      div.form-group
-        label(for="image") Image
-        input(type="file" name="image" id="image")
+      div.form-row
+        div.form-number
+          label(for="price") Prix en Pipots
+          input(type="number" min="1" name="price" id="price" required)
+        div.form-number
+          label(for="quantity") Quantité
+          input(type="number" min="1" name="quantity" id="quantity" required)
+      div.form-row
+        div.form-select
+          label(for="category_id") Catégorie
+          select(id="category_id" name="category_id")
+            each category in categories
+              option(value= category.id) #{category.name}
+        div.form-file
+          label(for="image") Image
+          input(type="file" name="image" id="image")
       div.form-submit
         button(type="submit") Ajouter
     if flashErrors

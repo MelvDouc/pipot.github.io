@@ -2,10 +2,10 @@ extends ../base.pug
 
 block main
   form(method="POST" action="/connexion")
-    div.form-group
+    div.form-text
       label(for="uuid") Nom d'utilisateur ou adresse email
       input(type="text" id="uuid" name="uuid" required)
-    div.form-group
+    div.form-text
       label(for="password") Mot de passe
       input(type="password" id="password" name="password" required)
     div.form-submit

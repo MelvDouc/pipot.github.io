@@ -16,3 +16,13 @@ body {
   font-family: $font-family1;
   background: rgb(245, 245, 245);
 }
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type=number] {
+  -moz-appearance: textfield;
+}

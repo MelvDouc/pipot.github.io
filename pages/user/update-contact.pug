@@ -2,23 +2,25 @@ extends ../base.pug
 
 block main
   h2= title
-  form(method="POST" action="modifier-mes-coordonnees")
-    div.form-group
-      label(for="first_name") Prénom
-      input(type="text" id="first_name" name="first_name" maxlength="50" value= user.first_name)
-    div.form-group
-      label(for="last_name") Nom de famille
-      input(type="text" id="last_name" name="last_name" maxlength="50" value= user.last_name)
-    div.form-group
+  form(method="POST" action="/modifier-mes-coordonnees")
+    div.form-row
+      div.form-text
+        label(for="first_name") Prénom
+        input(type="text" id="first_name" name="first_name" maxlength="50" value= user.first_name)
+      div.form-text
+        label(for="last_name") Nom de famille
+        input(type="text" id="last_name" name="last_name" maxlength="50" value= user.last_name)
+    div.form-text
       label(for="postal_address") Adresse postale
       input(type="text" id="last_name" name="last_name" maxlength="255" value= user.postal_address)
-    div.form-group
-      label(for="city") Ville
-      input(type="text" id="city" name="city" maxlength="50" value= user.city)
-    div.form-group
-      label(for="zip_code") Code postal
-      input(type="text" id="zip_code" name="zip_code" maxlength="10" value= user.zip_code)
-    div.form-group
+    div.form-row
+      div.form-text
+        label(for="city") Ville
+        input(type="text" id="city" name="city" maxlength="50" value= user.city)
+      div.form-text
+        label(for="zip_code") Code postal
+        input(type="text" id="zip_code" name="zip_code" maxlength="10" value= user.zip_code)
+    div.form-text
       label(for="phone_number") Numéro de téléphone
       input(type="text" id="phone_number" name="phone_number" maxlength="20" value= user.phone_number)
     div.form-submit

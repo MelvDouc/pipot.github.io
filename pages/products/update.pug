@@ -5,19 +5,19 @@ block main
   div.product-image
     img(src=`/build/img/products/${product.image}` alt= product.name)
   form(method="POST" action="/ajouter-article" enctype="multipart/form-data")
-    div.form-group
+    div.form-text
       label(for="name") Nom de l'article
       input(type="text" name="name" id="name" maxlength="50" value= product.name required)
-    div.form-group
+    div.form-text
       label(for="description")
       textarea(id="description" name="description")= product.description
-    div.form-group
+    div.form-number
       label(for="price") Prix en Pipots
       input(type="number" min="1" name="price" id="price" value= product.price required)
-    div.form-group
+    div.form-number
       label(for="quantity") Quantité
       input(type="number" min="1" name="quantity" id="quantity" value= product.quantity required)
-    div.form-group
+    div.form-file
       label(for="image") Image
       input(type="file" name="image" id="image")
     div.form-submit

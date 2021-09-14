@@ -3,10 +3,10 @@ extends ../base.pug
 block main
   h2 Ajouter un événement
   form(method="POST" action="/admin/ajouter-evenement" enctype="multipart/form-data")
-    div.form-group
+    div.form-text
       label(for="name") Nom de l'événement
       input(type="text" id="name" name="name" maxlength="50" required)
-    div.form-group
+    div.form-text
       label(for="description") Description
       textarea(id="description" name="description" required)
     div.form-group
@@ -15,7 +15,7 @@ block main
     div.form-group
       label(for="end_date") Date de fin
       input(type="datetime-local" id="end_date" name="end_date" required)
-    div.form-group
+    div.form-file
       label(for="image") Image
       input(type="file" id="image" name="image")
     div.form-submit

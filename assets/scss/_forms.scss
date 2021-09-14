@@ -1,48 +1,56 @@
 form {
-  display: flex;
+  --padding: .75em;
+  display: grid;
+  grid-template-rows: 1fr;
+  grid-gap: var(--padding);
+  padding: var(--padding);
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  color: white;
+  background: $green2;
+  background: $green-gradient1;
+  border-radius: 5px;
+
+  .form-row {
+    display: flex;
+    gap: var(--padding);
+
+    [class^="form-"] {
+      width: 100%;
+    }
+  }
+
+  // .form-group,
+  // .form-select,
+  // .form-checkbox {
+  //   padding: .5em;
+  // }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+
+    input {
+      height: 2em;
+    }
+
+    input[type="number"] {
+      width: 4em;
+    }
+  }
+
+  .form-select {
+    display: flex;
+    gap: .5em;
+    justify-content: space-between;
+
+    select {
+      width: 50%;
+    }
+  }
 
   .form-submit {
     @extend %gridCenter;
   }
-}
-
-.login-form {
-  flex-direction: column;
-  max-width: 800px;
-  margin: 0 auto 1em auto;
-  background: $green3;
-  background: $green-gradient2;
-  color: white;
-  padding: .75em;
-  border-radius: 5px;
-
-  .button {
-    // background: $blue1;
-    // background: $blue-gradient1;
-    background: hsl(222, 87%, 51%);
-  }
-}
-
-.logout-form {
-  justify-content: flex-end;
-
-  .button {
-    background: red;
-    color: white;
-    transition: box-shadow .2s;
-
-    &:hover {
-      box-shadow: 2px 2px 4px 2px hsl(0, 1%, 66%);
-    }
-  }
-}
-
-.form-group,
-.form-submit {
-  padding: .5em;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
 }

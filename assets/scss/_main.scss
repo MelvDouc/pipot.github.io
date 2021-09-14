@@ -1,5 +1,7 @@
 main {
   min-height: calc(100vh - var(--header-height));
+  display: flex;
+  flex-direction: column;
   
   h2 {
     font-size: 1.85rem;
@@ -11,6 +13,7 @@ main {
 
   .content {
     padding: 1em;
+    flex: 1;
   }
 }
 
