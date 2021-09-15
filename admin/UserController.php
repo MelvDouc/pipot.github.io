@@ -3,7 +3,7 @@
 namespace app\admin;
 
 use app\core\Request;
-use app\models\forms\users\UpdateUserForm;
+use app\models\User;
 
 class UserController extends AdminController
 {
@@ -12,19 +12,16 @@ class UserController extends AdminController
     if (!$this->isLoggedAsAdmin())
       return $this->redirectHome();
 
-    $id = $request->getParamId();
-    if (!$id) return $this->redirectNotFound();
+    if (!($id = $request->getParamId()))
+      return $this->redirectNotFound();
 
-    $user = $this->findUserById($id);
-    if (!$user) return $this->redirectNotFound();
-
-    $form = new UpdateUserForm("/admin-modifier-utilisateur/$id", $user);
-    $params = [
-      "form" => $form->createView(),
-      "user" => $user
-    ];
+    if (!($user = User::findOne(["id" => $id])))
+      return $this->redirectNotFound();
 
     if ($request->isGet())
-      return $this->render("admin/update-user", $params);
+      return $this->render("admin/update-user", [
+        "title" => "Modifier un utilisateur",
+        "user" => $user
+      ]);
   }
 }

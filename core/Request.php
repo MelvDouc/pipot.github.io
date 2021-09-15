@@ -34,17 +34,10 @@ class Request
     return $this->getMethod() === "post";
   }
 
-  public function getBody(): array
+  public function get(string $key): mixed
   {
-    $body = [];
-    $isPost = $this->isPost();
-    $globalArray = $isPost ? $_POST : $_GET;
-    $input = $isPost ? INPUT_POST : INPUT_GET;
-
-    foreach (array_keys($globalArray) as $key)
-      $body[$key] = filter_input($input, $key, FILTER_SANITIZE_SPECIAL_CHARS);
-    if ($isPost) $body["files"] = $_FILES;
-
-    return $body;
+    if (isset($_POST[$key]))
+      return filter_input(INPUT_POST, $key, FILTER_SANITIZE_SPECIAL_CHARS);
+    return null;
   }
 }

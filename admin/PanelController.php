@@ -4,6 +4,7 @@ namespace app\admin;
 
 use app\core\Application;
 use app\core\Request;
+use app\models\Product;
 use app\models\User;
 
 class PanelController extends AdminController
@@ -21,12 +22,12 @@ class PanelController extends AdminController
     if (!$this->isLoggedAsAdmin())
       return $this->login($request);
 
-    $products = Application::$instance
-      ->database
-      ->findAllProducts();
+    $products = Product::findAll();
 
     return $this->render("admin/all-products", [
-      "products" => $products
+      "title" => "Liste des articles",
+      "products" => $products,
+      "flashSuccess" => $this->getFlash("success")
     ]);
   }
 
@@ -35,12 +36,9 @@ class PanelController extends AdminController
     if (!$this->isLoggedAsAdmin())
       return $this->login($request);
 
-    $users = Application::$instance
-      ->database
-      ->findAll(User::DB_TABLE, ["*"]);
-
     return $this->render("admin/all-users", [
-      "users" => $users
+      "title" => "Liste des utilisateurs",
+      "users" => User::findAll()
     ]);
   }
 }

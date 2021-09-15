@@ -2,30 +2,28 @@
 
 namespace app\admin;
 
-use app\core\Application;
 use app\core\Request;
 use app\models\Event;
 
 class EventController extends AdminController
 {
-  public function add(Request $request)
+  public function add(Request $req)
   {
     if (!$this->isLoggedAsAdmin())
       return $this->redirectHome();
 
-    if ($request->isGet())
+    if ($req->isGet())
       return $this->render("admin/events/add", [
         "title" => "Ajouter un événement"
       ]);
 
     $userId = (int) $this->getSessionUser()["id"];
-    $body = $request->getBody();
-    $event = new Event($request->getBody(), $userId);
-    $event->name = $body["name"] ?? null;
-    $event->description = $body["description"] ?? null;
+    $event = new Event();
+    $event->name = $req->get("name");
+    $event->description = $req->get("body");
     $event->author_id = $userId;
-    $event->start_date = $body["start_date"] ?? null;
-    $event->end_date = $body["end_date"] ?? null;
+    $event->start_date = $req->get("start_date");
+    $event->end_date = $req->get("end_date");
     $event->setFile($_FILES["image"] ?? null);
 
     if (!$event->isValid()) {
@@ -39,28 +37,27 @@ class EventController extends AdminController
     return $this->redirect("/evenements");
   }
 
-  public function update(Request $request)
+  public function update(Request $req)
   {
     if (!$this->isLoggedAsAdmin())
       return $this->redirectHome();
 
-    if (!($id = $request->getParamId()))
+    if (!($id = $req->getParamId()))
       return $this->redirectNotFound();
 
     if (!($event = Event::findOne(["id" => $id])))
       return $this->redirectNotFound();
 
-    if ($request->isGet())
+    if ($req->isGet())
       return $this->render("admin/events/update", [
         "title" => "Modifier un événement",
         "event" => $event
       ]);
 
-    $body = $request->getBody();
-    $event->name = $body["name"] ?? null;
-    $event->description = $body["description"] ?? null;
-    $event->start_date = $body["start_date"] ?? null;
-    $event->end_date = $body["end_date"] ?? null;
+    $event->name = $req->get("name");
+    $event->description = $req->get("description");
+    $event->start_date = $req->get("start_date");
+    $event->end_date = $req->get("end_date");
     $event->setFile($_FILES["image"] ?? null);
 
     if (!$event->isValid()) {

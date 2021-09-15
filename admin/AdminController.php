@@ -13,6 +13,8 @@ class AdminController extends Controller
       return $this->redirectNotFound();
 
     if ($request->isGet())
-      return $this->render("admin/login");
+      return $this->render("admin/login", [
+        "title" => "Connexion"
+      ]);
   }
 }

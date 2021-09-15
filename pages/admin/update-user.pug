@@ -1,0 +1,41 @@
+extends ./base.pug
+
+block content
+  h2= title
+  form(method="POST" action=`/admin/modifier-utilisateur/${user.id}`)
+    div.form-text
+      label(for="username") Nom d'utilisateur
+      input(type="text" id="username" name="username" value= user.username maxlength="50" required)
+    div.form-select
+      label(for="role") Rôle
+      select(id="role" name="role")
+        option(value="ADMIN") ADMIN
+        option(value="USER") USER
+    div.form-text
+      label(for="first_name")
+      input(type="text" id="first_name" name="first_name" value= user.first_name maxlength="50")
+    div.form-text
+      label(for="last_name")
+      input(type="text" id="last_name" name="last_name" value= user.last_name maxlength="50")
+    div.form-text
+      label(for="postal_address")
+      input(type="text" id="postal_address" name="postal_address" value= user.postal_address maxlength="255")
+    div.form-text
+      label(for="city")
+      input(type="text" id="city" name="city" value= user.city maxlength="50")
+    div.form-text
+      label(for="zip_code")
+      input(type="text" id="zip_code" name="zip_code" value= user.zip_code maxlength="10")
+    div.form-text
+      label(for="phone_number")
+      input(type="text" id="phone_number" name="phone_number" value= user.phone_number maxlength="20")
+    div.form-file
+      label(for="image")
+      input(type="file" id="image" name="image")
+    div.form-submit
+      button(type="submit") Valider
+
+  if flashErrors
+    ul
+      each error in flashErrors
+        li= error

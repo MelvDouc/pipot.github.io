@@ -23,7 +23,7 @@ class User extends Model
   public ?string $phone_number;
   public ?string $verification_string;
   public int $is_account_active;
-  public string $image;
+  public ?string $image;
   public string $added_at;
 
   private static function instantiate(array $dbUser): User

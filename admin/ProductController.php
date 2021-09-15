@@ -4,11 +4,19 @@ namespace app\admin;
 
 use app\core\Request;
 use app\models\Product;
-use app\core\Application;
-use app\models\forms\products\UpdateProductForm;
 
 class ProductController extends AdminController
 {
+  private function update_get(Product $product)
+  {
+    return $this->render("products/update", [
+      "title" => "Modifier un article",
+      "product" => $product,
+      "flashSuccess" => $this->getFlash("success"),
+      "flashErrors" => $this->getFlash("errors"),
+    ]);
+  }
+
   public function update(Request $request)
   {
     if (!$this->isLoggedAsAdmin())
@@ -17,60 +25,34 @@ class ProductController extends AdminController
     if (!($id = $request->getParamId()))
       return $this->redirectNotFound();
 
-    if (!($product = $this->findProductById($id)))
+    if (!($product = Product::findOne(["id" => $id])))
       return $this->redirectNotFound();
 
-    $form = new UpdateProductForm("/admin-modifier-article/$id", $product);
-    $params = [
-      "form" => $form->createView(),
-      "product_name" => $product["name"],
-      "product_image" => $product["image"],
-      "is_admin" => true
-    ];
-
     if ($request->isGet())
-      return $this->render("products/update", $params);
+      return $this->update_get($product);
 
-    $updated_product = new Product($request->getBody(), (int)$product["seller_id"]);
-    $validation = $updated_product->validate();
-
-    if ($validation !== 1) {
-      $params["error_message"] = $validation;
-      return $this->render("products/update", $params);
+    if (!$product->isValid()) {
+      $this->setFlash("errors", $product->getErrors());
+      return $this->update_get($product);
     }
 
-    if (!$updated_product->updateFrom($product)) {
-      $params["error_message"] = "La modification de l'article a échoué.";
-      return $this->render("products/update", $params);
-    }
-
-    return $this->redirect("/admin-articles", "admin/all-products", []);
+    $product->update();
+    $this->setFlash("success", "L'article a bien été modifié.");
+    return $this->redirect("/admin/articles");
   }
 
   public function delete(Request $request)
   {
-    if (!$request->isPost())
-      return $this->redirectNotFound();
-
     if (!$this->isLoggedAsAdmin())
       return $this->redirectHome();
 
     if (!($id = $request->getParamId()))
       return $this->redirectNotFound();
 
-    $product = $this->findProductById($id);
-    if (!$product) return $this->redirectNotFound();
+    if (!($product = Product::findOne(["id" => $id])))
+      return $this->redirectNotFound();
 
-    $product_id = (int)$product["id"];
-    $deletion = Application::$instance
-      ->database
-      ->deleteProduct($product_id);
-
-    if (!$deletion)
-      return $this->redirect("/admin-articles", "admin/all-products", [
-        "error_message" => "La suppression du produit a échoué."
-      ]);
-
-    return $this->redirect("/admin-articles", "admin/all-products");
+    $this->setFlash("success", "L'article a bien été supprimé.");
+    return $this->redirect("/admin-articles");
   }
 }
