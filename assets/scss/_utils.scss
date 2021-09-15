@@ -28,12 +28,11 @@ $silver-gradient1: linear-gradient(315deg, $silver1 0%, $silver2 74%);
   place-items: center;
 }
 
-.button {
+%button {
   all: unset;
   @extend %gridCenter;
   text-align: center;
   text-decoration: none;
-  font-size: 1.1rem;
   font-weight: bold;
   font-family: $font-family1;
   padding: .5em .75em;

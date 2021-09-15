@@ -3,7 +3,7 @@ extends ../base.pug
 block main
   h2= title
   div.content
-    form(method="POST" action="/ajouter-article" enctype="multipart/form-data")
+    form(method="POST" action="/ajouter-article" enctype="multipart/form-data" id="add-product-form")
       div.form-text
         label(for="name") Nom de l'article
         input(type="text" name="name" id="name" maxlength="50" required)
@@ -13,10 +13,10 @@ block main
       div.form-row
         div.form-number
           label(for="price") Prix en Pipots
-          input(type="number" min="1" name="price" id="price" required)
+          input(type="number" min="1" name="price" id="price" placeholder="1" required)
         div.form-number
           label(for="quantity") Quantité
-          input(type="number" min="1" name="quantity" id="quantity" required)
+          input(type="number" min="1" name="quantity" id="quantity" placeholder="1" required)
       div.form-row
         div.form-select
           label(for="category_id") Catégorie

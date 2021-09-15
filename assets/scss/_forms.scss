@@ -7,10 +7,15 @@ form {
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
-  color: white;
-  background: $green2;
-  background: $green-gradient1;
   border-radius: 5px;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+
+  label {
+    background: rgba(255, 255, 255, .6);
+    padding: .2em;
+  }
 
   .form-row {
     display: flex;
@@ -21,30 +26,32 @@ form {
     }
   }
 
-  // .form-group,
-  // .form-select,
-  // .form-checkbox {
-  //   padding: .5em;
-  // }
-
-  .form-group {
+  .form-number,
+  .form-select,
+  .form-checkbox,
+  .form-file {
     display: flex;
-    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .form-text {
+    input, textarea {
+      width: 100%;
+    }
 
     input {
       height: 2em;
     }
+  }
 
+  .form-number {
     input[type="number"] {
       width: 4em;
+      text-align: center;
     }
   }
 
   .form-select {
-    display: flex;
-    gap: .5em;
-    justify-content: space-between;
-
     select {
       width: 50%;
     }
@@ -52,5 +59,16 @@ form {
 
   .form-submit {
     @extend %gridCenter;
+    margin-top: 1em;
+
+    [type="submit"] {
+      @extend %button;
+      color: white;
+      background: $blue1;
+    }
   }
+}
+
+#add-product-form {
+  background-image: url("../img/backgrounds/blue-sky.jpg");
 }
