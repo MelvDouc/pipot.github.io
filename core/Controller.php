@@ -11,28 +11,25 @@ class Controller
     Application::$instance->router->renderView($page, $params);
   }
 
-  protected function redirect(string $location, ?string $page = null, array $params = [])
+  protected function redirect(string $location)
   {
-    if ($page)
-      $this->render($page, $params);
     return header("Location: $location");
   }
 
-  protected function redirectHome(array $params = [])
+  protected function redirectHome()
   {
-    return $this->redirect("/accueil", "home/home", $params);
+    return $this->redirect("/accueil");
   }
 
   protected function redirectToLogin()
   {
-    return $this->redirect("/connexion", "authentication/login", [
-      "error" => "Vous n'êtes pas connecté."
-    ]);
+    $this->setFlash("errors", ["Vous n'êtes pas connecté(e)."]);
+    return $this->redirect("/connexion");
   }
 
-  protected function redirectNotFound(array $params = [])
+  protected function redirectNotFound()
   {
-    return $this->render("404", $params);
+    return $this->redirect("/404");
   }
 
   protected function getSessionUser(): ?User
@@ -44,13 +41,15 @@ class Controller
 
   protected function isLoggedAsUser(): bool
   {
-    if (!$this->getSessionUser()) return false;
+    if (!$this->getSessionUser())
+      return false;
     return $this->getSessionUser()->role === "USER";
   }
 
   protected function isLoggedAsAdmin(): bool
   {
-    if (!$this->getSessionUser()) return false;
+    if (!$this->getSessionUser())
+      return false;
     return $this->getSessionUser()->role === "ADMIN";
   }
 

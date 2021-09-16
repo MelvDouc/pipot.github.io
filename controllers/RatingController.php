@@ -9,9 +9,9 @@ use app\models\User;
 
 class RatingController extends Controller
 {
-  public function rate(Request $request)
+  public function rate(Request $req)
   {
-    if (!($rated_id = $request->getParamId()))
+    if (!($rated_id = $req->getParamId()))
       return $this->redirectNotFound();
 
     if (!($user = $this->getSessionUser()))
@@ -23,17 +23,20 @@ class RatingController extends Controller
 
     if (!$rated_user) return $this->redirectNotFound();
 
-    $body = $request->getBody();
-    $score = $body["score"] ?? null;
-
-    if (!$score || (int) $score < 0 || (int) $score > 5)
+    if (!($score = (int) $req->get("score")) || $score < 0 || $score > 5)
       return $this->redirectNotFound();
 
-    $rater_id = (int) $user["id"];
     Application::$instance
       ->database
-      ->addRating($rated_id, $rater_id, (int) $score);
+      ->add(
+        "ratings",
+        [
+          "score" => $score,
+          "rated_id" => $rated_id,
+          "rater_id" => $user->id,
+        ]
+      );
 
-    return $this->redirect("/profil/$rated_id", "user/profile");
+    return $this->redirect("/profil/$rated_id");
   }
 }

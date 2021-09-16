@@ -16,9 +16,9 @@ class ProfileController extends Controller
     return $param_id === $sessionId;
   }
 
-  public function profile(Request $request)
+  public function profile(Request $req)
   {
-    if (!($id = $request->getParamId()))
+    if (!($id = $req->getParamId()))
       return $this->redirectNotFound();
 
     $user = User::findOne(["id" => $id]);
@@ -55,20 +55,19 @@ class ProfileController extends Controller
     ]);
   }
 
-  public function updatePassword(Request $request)
+  public function updatePassword(Request $req)
   {
     if (!($user = $this->getSessionUser()))
       return $this->redirectToLogin();
 
-    if ($request->isGet())
+    if ($req->isGet())
       return $this->render("user/update-password", [
         "title" => "Modifier mon mot de passe"
       ]);
 
-    $body = $request->getBody();
-    $user->setPasswords("old", $body["old-password"] ?? null);
-    $user->setPasswords("new", $body["new-password"] ?? null);
-    $user->setPasswords("confirm", $body["confirm-new-password"] ?? null);
+    $user->setPasswords("old", $req->get("old-password"));
+    $user->setPasswords("new", $req->get("new-password"));
+    $user->setPasswords("confirm", $req->get("confirm-new-password"));
 
     if (!$user->isPasswordUpdateValid())
       return $this->render("user/update-password", [
@@ -81,21 +80,20 @@ class ProfileController extends Controller
     return $this->redirect("/mon-profil");
   }
 
-  public function updateContact(Request $request)
+  public function updateContact(Request $req)
   {
     if (!($user = $this->getSessionUser()))
       return $this->redirectToLogin();
 
-    if ($request->isGet())
+    if ($req->isGet())
       return $this->render("user/update-contact", [
         "title" => "Modifier mes coordonnées",
         "user" => $user
       ]);
 
-    $body = $request->getBody();
     $contactProperties = ["first_name", "last_name", "postal_address", "city", "zip_code", "phone_number"];
     foreach ($contactProperties as $property)
-      $user->{$property} = $body[$property] ?? null;
+      $user->{$property} = $req->get($property);
 
     if (!$user->isContactUpdateValid())
       return $this->render("user/update-contact", [

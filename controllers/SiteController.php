@@ -14,4 +14,11 @@ class SiteController extends Controller
       "flashErrors" => $this->getFlash("errors")
     ]);
   }
+
+  public function notFound()
+  {
+    return $this->render("404", [
+      "title" => "Page non trouvée"
+    ]);
+  }
 }

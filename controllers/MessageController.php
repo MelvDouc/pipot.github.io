@@ -10,20 +10,19 @@ use app\models\User;
 
 class MessageController extends Controller
 {
-  public function my_messages(Request $request)
+  public function my_messages(Request $req)
   {
     if (!($user = $this->getSessionUser()))
       return $this->redirectToLogin();
 
-    if ($request->isGet())
+    if ($req->isGet())
       return $this->get();
 
-    $body = $request->getBody();
     $directMessage = new DirectMessage();
     $directMessage->sender_id = $user->id;
-    $directMessage->recipient_id = (int) $body["recipient_id"] ?? null;
-    $directMessage->subject = $body["subject"] ?? null;
-    $directMessage->content = $body["content"] ?? null;
+    $directMessage->recipient_id = (int) $req->get("recipient_id");
+    $directMessage->subject = $req->get("subject");
+    $directMessage->content = $req->get("content");
 
     if (!$directMessage->isValid())
       return $this->get($directMessage->getErrors());
@@ -36,12 +35,13 @@ class MessageController extends Controller
     if (!($user = $this->getSessionUser()))
       return $this->redirectToLogin();
 
-    $userId = $user->id;
-    $sent_messages = DirectMessage::findAll(["sender_id" => $userId]);
-    $received_messages = DirectMessage::findAll(["recipient_id" => $userId]);
-    $users = Application::$instance->database->findAll(User::DB_TABLE, ["id", "username"]);
+    $sent_messages = DirectMessage::findAll(["sender_id" => $user->id]);
+    $received_messages = DirectMessage::findAll(["recipient_id" => $user->id]);
+    $users = Application::$instance
+      ->database
+      ->findAll(User::DB_TABLE, ["id", "username"]);
 
-    return $this->render("uer/my-messages", [
+    return $this->render("user/my-messages", [
       "sent_messages" => $sent_messages,
       "received_messages" => $received_messages,
       "users" => $users,

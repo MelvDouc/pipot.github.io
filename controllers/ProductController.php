@@ -30,9 +30,9 @@ class ProductController extends Controller
       );
   }
 
-  public function product(Request $request)
+  public function product(Request $req)
   {
-    if (!($id = $request->getParamId()))
+    if (!($id = $req->getParamId()))
       return $this->redirectNotFound();
 
     if (!($product = Product::findOne(["id" => $id])))
@@ -45,26 +45,25 @@ class ProductController extends Controller
     ]);
   }
 
-  public function add(Request $request)
+  public function add(Request $req)
   {
     if (!($user = $this->getSessionUser()))
       return $this->redirectToLogin();
 
     $categories = Category::findAll();
 
-    if ($request->isGet())
+    if ($req->isGet())
       return $this->render("products/add", [
         "title" => "Ajouter un article",
         "categories" => $categories
       ]);
 
-    $body = $request->getBody();
     $product = new Product();
-    $product->name = $body["name"] ?? null;
-    $product->description = $body["description"] ?? null;
-    $product->price = (int) $body["price"] ?? null;
-    $product->quantity = (int) $body["quantity"] ?? null;
-    $product->category_id = (int) $body["category_id"] ?? null;
+    $product->name = $req->get("name");
+    $product->description = $req->get("description");
+    $product->price = (int) $req->get("price");
+    $product->quantity = (int) $req->get("quantity");
+    $product->category_id = (int) $req->get("category_id");
     $product->seller_id = $user->id;
     if (isset($_FILES["image"]) && $_FILES["image"]["name"])
       $product->setFile($_FILES["image"] ?? null);
@@ -80,12 +79,12 @@ class ProductController extends Controller
     return $this->redirect("/mes-articles");
   }
 
-  public function update(Request $request)
+  public function update(Request $req)
   {
     if (!($user = $this->getSessionUser()))
       return $this->redirectToLogin();
 
-    if (!($id = $request->getParamId()))
+    if (!($id = $req->getParamId()))
       return $this->redirectNotFound();
 
     if (!($product = Product::findOne(["id" => $id])))
@@ -93,19 +92,18 @@ class ProductController extends Controller
 
     $categories = Category::findAll();
 
-    if ($request->isGet())
+    if ($req->isGet())
       return $this->render("products/update", [
         "title" => "Modifier un article",
         "categories" => $categories,
         "product" => $product
       ]);
 
-    $body = $request->getBody();
-    $product->name = $body["name"] ?? null;
-    $product->description = $body["description"] ?? null;
-    $product->price = (int) $body["price"] ?? null;
-    $product->quantity = (int) $body["quantity"] ?? null;
-    $product->category_id = (int) $body["category_id"] ?? null;
+    $product->name = $req->get("name");
+    $product->description = $req->get("description");
+    $product->price = (int) $req->get("price");
+    $product->quantity = (int) $req->get("quantity");
+    $product->category_id = (int) $req->get("category_id");
     $product->seller_id = $user->id;
     $product->setFile($_FILES["image"] ?? null);
 
@@ -120,12 +118,12 @@ class ProductController extends Controller
     return $this->redirect("/mes-articles");
   }
 
-  public function delete(Request $request)
+  public function delete(Request $req)
   {
     if (!$this->getSessionUser())
       return $this->redirectToLogin();
 
-    if (!($id = $request->getParamId()))
+    if (!($id = $req->getParamId()))
       return $this->redirectNotFound();
 
     if (!($product = Product::findOne(["id" => $id])))
@@ -135,10 +133,9 @@ class ProductController extends Controller
     return $this->redirect("/mes-articles");
   }
 
-  public function search(Request $request)
+  public function search(Request $req)
   {
-    $body = $request->getBody();
-    $keywords = $body["keywords"] ?? null;
+    $keywords = $req->get("keywords");
 
     if (!$keywords) return $this->redirectHome();
 

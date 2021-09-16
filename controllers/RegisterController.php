@@ -8,12 +8,12 @@ use app\models\User;
 
 class RegisterController extends Controller
 {
-  public function register(Request $request)
+  public function register(Request $req)
   {
     if ($this->getSessionUser())
       return $this->redirect("/mon-profil");
 
-    if ($request->isGet())
+    if ($req->isGet())
       return $this->render("registration/index", [
         "title" => "Inscription"
       ]);
@@ -24,12 +24,11 @@ class RegisterController extends Controller
         "flashErrors" => ["Veuillez accepter les conditions d'utilisation."]
       ]);
 
-    $body = $request->getBody();
     $user = new User();
-    $user->username = $body["username"] ?? null;
-    $user->email = $body["email"] ?? null;
-    $user->setPasswords("plain", $body["password"] ?? null);
-    $user->setPasswords("confirm", $body["confirm-password"] ?? null);
+    $user->username = $req->get("username");
+    $user->email = $req->get("email");
+    $user->setPasswords("plain", $req->get("password"));
+    $user->setPasswords("confirm", $req->get("confirm-password"));
 
     if (!$user->isValid())
       return $this->render("register/index", [
@@ -39,7 +38,7 @@ class RegisterController extends Controller
 
     $user->save();
     $user->sendConfirmation();
-    return $this->redirect("/accueil", "home/home");
+    return $this->redirectHome();
   }
 
   public function validation()
@@ -49,7 +48,9 @@ class RegisterController extends Controller
     if (!$verification_string)
       return $this->redirectHome();
 
-    $user = User::findOne(["verification_string" => $verification_string]);
+    if (!($user = User::findOne(["verification_string" => $verification_string])))
+      return $this->redirectNotFound();
+
     $user->activateAcouunt();
     return $this->render("registration/verification");
   }

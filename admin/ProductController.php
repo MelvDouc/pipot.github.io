@@ -53,6 +53,6 @@ class ProductController extends AdminController
       return $this->redirectNotFound();
 
     $this->setFlash("success", "L'article a bien été supprimé.");
-    return $this->redirect("/admin-articles");
+    return $this->redirect("/admin/articles");
   }
 }

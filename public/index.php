@@ -22,6 +22,8 @@ require "../vendor/autoload.php";
 
 $app = new Application(dirname(__DIR__));
 
+$app->get("/404", [SiteController::class, "notFound"]);
+
 $app->get("/", [SiteController::class, "home"]);
 $app->get("/accueil", [SiteController::class, "home"]);
 
