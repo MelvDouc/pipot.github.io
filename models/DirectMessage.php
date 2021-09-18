@@ -35,9 +35,25 @@ class DirectMessage extends Model
     }, $dbMessages);
   }
 
+  public function getSender(): ?User
+  {
+    if (!$this->sender_id) return null;
+    return User::findOne(["id" => $this->sender_id]);
+  }
+
+  public function getRecipient(): ?User
+  {
+    if (!$this->recipient_id) return null;
+    return User::findOne(["id" => $this->recipient_id]);
+  }
+
   private function checkSubject(): void
   {
-    if (!$this->subject || strlen($this->subject) > 50)
+    if (!$this->subject) {
+      $this->addError("Veuillez ajouter un sujet.");
+      return;
+    }
+    if (strlen($this->subject) > 50)
       $this->addError("Le sujet ne doit dépasser 50 caractères.");
   }
 
@@ -49,8 +65,15 @@ class DirectMessage extends Model
 
   private function checkRecipientId(): void
   {
-    $recipient = User::findOne(["id" => $this->recipient_id]);
-    if (!$recipient)
+    if (!$this->recipient_id) {
+      $this->addError("Veuillez choisir un destinataire.");
+      return;
+    }
+    if ($this->recipient_id === $this->sender_id) {
+      $this->addError("Vous ne pouvez pas vous envoyer un message à vous-même.");
+      return;
+    }
+    if (!$this->getRecipient())
       $this->addError("Destinataire non trouvé.");
   }
 
@@ -69,13 +92,10 @@ class DirectMessage extends Model
       ->add(
         self::DB_TABLE,
         [
-          "name" => $this->name,
-          "description" => $this->description,
-          "price" => $this->price,
-          "quantity" => $this->quantity,
-          "seller_id" => $this->seller_id,
-          "category_id" => $this->category_id,
-          "image" => $this->image
+          "sender_id" => $this->sender_id,
+          "recipient_id" => $this->recipient_id,
+          "subject" => $this->subject,
+          "content" => $this->content,
         ]
       );
   }

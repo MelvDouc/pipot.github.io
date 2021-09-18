@@ -1,14 +1,34 @@
 extends ../base.pug
 
 block main
-  h2 Messagerie
+  h2= title
   div.content
-    section#inbox
-      each message in received_messages
-        p= message.content
-    section#outbox
-      each message in sent_messages
-        p= message.content
+    nav#messages-nav
+      ul
+        li
+          a(data-link="inbox") Messages reçus
+        li
+          a(data-link="outbox") Messages envoyés
+        li
+          a(data-link="send-new") Nouveau message
+    section.hidden#inbox
+      if received_messages
+        each message in received_messages
+          article
+            h3= message.subject
+            - var sender = message.getSender()
+            div De #[a(href=`/profil/${sender.id}`) #{sender.username}]
+            div= message.content
+      else
+        p Aucun message reçu.
+    section.hidden#outbox
+      if sent_messages
+        each message in sent_messages
+          - var recipient = message.getRecipient()
+          div À #[a(href=`/profil/${recipient.id}`) #{recipient.username}]
+          div= message.content
+      else
+        p Aucun message envoyé.
     section#send-new
       form(method="POST" action="/messagerie")
         div.form-text

@@ -1,3 +1,4 @@
-import { getHeaderHeight } from "./functions.js";
+import { displayMessageTabs, getHeaderHeight } from "./functions.js";
 
 getHeaderHeight();
+displayMessageTabs();

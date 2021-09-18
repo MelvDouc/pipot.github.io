@@ -1,0 +1,27 @@
+#messages-nav {
+  $clr1: rgb(252, 234, 186);
+  $clr2: rgb(252, 207, 86);
+
+  ul {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+
+    li {
+      @extend %gridCenter;
+      padding: .66em;
+      background: var(--clr2);
+      background: linear-gradient(to right, $clr1, $clr2);
+
+      &:hover {
+        background: linear-gradient(to right, adjust-hue($clr1, 45deg), adjust-hue($clr2, 45deg));
+      }
+
+      a {
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        cursor: pointer;
+      }
+    }
+  }
+}

@@ -63,8 +63,8 @@ $app->post("/modifier-mes-coordonnees", [ProfileController::class, "updateContac
 $app->get("/mes-articles", [ProfileController::class, "myProducts"]);
 
 // Messages
-$app->get("/messagerie", [MessageController::class, "my_messages"]);
-$app->post("/messagerie", [MessageController::class, "my_messages"]);
+$app->get("/messagerie", [MessageController::class, "myMessages"]);
+$app->post("/messagerie", [MessageController::class, "myMessages"]);
 
 // Notation
 $app->post("/noter", [RatingController::class, "rate"]);

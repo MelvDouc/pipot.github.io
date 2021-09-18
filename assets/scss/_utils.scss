@@ -44,6 +44,10 @@ $silver-gradient1: linear-gradient(315deg, $silver1 0%, $silver2 74%);
   }
 }
 
+.hidden {
+  display: none;
+}
+
 @keyframes fadeOut {
   0% {
     opacity: 1;

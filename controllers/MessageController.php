@@ -10,13 +10,25 @@ use app\models\User;
 
 class MessageController extends Controller
 {
-  public function my_messages(Request $req)
+  public function myMessages(Request $req)
   {
     if (!($user = $this->getSessionUser()))
       return $this->redirectToLogin();
 
-    if ($req->isGet())
-      return $this->get();
+    $users = Application::$instance
+      ->database
+      ->findAll(User::DB_TABLE, ["id", "username"]);
+
+    if ($req->isGet()) {
+      return $this->render("user/my-messages", [
+        "title" => "Messagerie",
+        "sent_messages" => DirectMessage::findAll(["sender_id" => $user->id]),
+        "received_messages" => DirectMessage::findAll(["recipient_id" => $user->id]),
+        "users" => $users,
+        "flashSuccess" => $this->getFlash("success"),
+        "flashErrors" => $this->getFlash("errors")
+      ]);
+    }
 
     $directMessage = new DirectMessage();
     $directMessage->sender_id = $user->id;
@@ -24,29 +36,13 @@ class MessageController extends Controller
     $directMessage->subject = $req->get("subject");
     $directMessage->content = $req->get("content");
 
-    if (!$directMessage->isValid())
-      return $this->get($directMessage->getErrors());
+    if (!$directMessage->isValid()) {
+      $this->setFlash("errors", $directMessage->getErrors());
+      return $this->redirect("/messagerie");
+    }
 
-    return $this->get([], "Le message a bien été envoyé.");
-  }
-
-  private function get(?array $errors = [], ?string $success = null)
-  {
-    if (!($user = $this->getSessionUser()))
-      return $this->redirectToLogin();
-
-    $sent_messages = DirectMessage::findAll(["sender_id" => $user->id]);
-    $received_messages = DirectMessage::findAll(["recipient_id" => $user->id]);
-    $users = Application::$instance
-      ->database
-      ->findAll(User::DB_TABLE, ["id", "username"]);
-
-    return $this->render("user/my-messages", [
-      "sent_messages" => $sent_messages,
-      "received_messages" => $received_messages,
-      "users" => $users,
-      "flashErrors" => $errors,
-      "flashSuccess" => $success
-    ]);
+    $directMessage->save();
+    $this->setFlash("success", "Le message a bien été envoyé.");
+    return $this->redirect("/messagerie");
   }
 }
