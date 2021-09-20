@@ -32,7 +32,7 @@ class Database
         $this->password
       );
       $this->db->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-      $SQLFilePath = Application::$ROOT_DIR . "/assets/create-db.sql";
+      $SQLFilePath = Application::$ROOT_DIR . "/create-db.sql";
       $dbInitialization = file_get_contents($SQLFilePath);
       $statement = $this->db->prepare($dbInitialization);
       $statement->execute();

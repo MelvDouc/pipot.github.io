@@ -1,0 +1,64 @@
+#user-products {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1em;
+
+  .product-card {
+    background: $green1;
+    padding: .75em;
+    border-radius: 5px;
+
+    .image {
+      @extend %gridCenter;
+      background: $silver1 content-box;
+
+      img {
+        width: 95%;
+      }
+    }
+
+    .detail {
+      h3 {
+        padding: .45em;
+      }
+
+      dl {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .action {
+      padding: .45em;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+
+      button {
+        all: unset;
+        @extend %gridCenter;
+        text-align: center;
+        font-weight: bold;
+        padding: .33em .5em;
+        color: white;
+        border-radius: 99999px;
+      }
+
+      > button {
+        background: $blue1;
+
+        a {
+          text-decoration: none;
+        }
+      }
+
+      form {
+        all: unset;
+      }
+
+      button[type="submit"] {
+        background: red;
+      }
+    }
+  }
+}

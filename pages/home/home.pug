@@ -2,11 +2,5 @@ extends ../base.pug
 
 block main
   h2 Accueil
-  if flashSuccess
-    p.flash= flashSuccess
-  if flashErrors
-    ul
-      each error in flashErrors
-        li= error
   div.content
     p Bienvenue sur PIPOT, le numéro 1 du troc en ligne&nbsp;!

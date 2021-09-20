@@ -17,9 +17,3 @@ block main
       input(type="datetime-local" id="end_date" name="end_date" value= event.end_date required)
     div.form-submit
       button(type="submit") Ajouter
-
-    
-  if flashErrors
-    ul
-      each error in errors
-        li= error

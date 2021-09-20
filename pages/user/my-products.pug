@@ -3,29 +3,27 @@ extends ../base.pug
 block main
   h2 Articles de #{user.username}
   div.content
-    ul
+    div#user-products
       each product in user.getProducts()
-        li
-          div.product-card
-            section.left
-              img(src=`/build/img/products/${product.image}` alt= product.name)
-            section.right
-              h3
-                a(href=`/articles/${product.id}`) #{product.name}
-              div.detail
-                dl
-                  dt Description
-                  dd= product.description
-                  dt Prix
-                  dd= product.price
-                  dt Quantité disponible
-                  dd= product.quantity
-                  dt Catégorie
-                  dd= product.getCategoryName()
-                  dt Publié le
-                  dd= product.added_at
-              div.actions
-                button.button
-                  a(href=`/modifier-article/${product.id}`) Modifier
-                form(method="POST" action=`/supprimer-article/${product.id}`)
-                  input(type="submit" value="Supprimer")
+        div.product-card
+          section.image
+            img(src=`/build/img/products/${product.image}` alt= product.name)
+          section.detail
+            h3
+              a(href=`/articles/${product.id}`) #{product.name}
+            dl
+              dt Description
+              dd= product.description
+              dt Prix
+              dd= product.price
+              dt Quantité disponible
+              dd= product.quantity
+              dt Catégorie
+              dd= product.getCategoryName()
+              dt Publié le
+              dd= product.added_at
+          section.action
+            button.button
+              a(href=`/modifier-article/${product.id}`) Modifier
+            form(method="POST" action=`/supprimer-article/${product.id}`)
+              button(type="submit") Supprimer

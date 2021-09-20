@@ -1,0 +1,53 @@
+#profile-update {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  margin-bottom: 2em;
+
+  a {
+    text-decoration: none;
+    padding: .75em;
+    background: $silver1;
+    border-radius: 5px;
+  }
+}
+
+#average-score {
+  padding: .75em;
+  border: 1px solid black;
+  border-radius: 5px;
+  width: max-content;
+  margin-bottom: 2em;
+
+  h3 {
+    text-align: left;
+  }
+
+  div {
+    text-align: center;
+  }
+}
+
+#coordinates {
+
+  table {
+    border-collapse: collapse;
+
+    tr {
+      border-top: 1px solid black;
+    }
+
+    tr:last-child {
+      border-bottom: 1px solid black;
+    }
+
+    th, td {
+      border-left: 1px solid black;
+      padding: .5em;
+    }
+
+    th:last-child, td:last-child {
+      border-right: 1px solid black;
+    }
+  }
+}

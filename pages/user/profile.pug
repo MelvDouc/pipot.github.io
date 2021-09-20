@@ -4,10 +4,8 @@ block main
   h2 Profil de #{user.username}
   include ../_inc/user-nav.pug
   div.content
-    if flashSuccess
-      p.flash= flashSuccess
     if isUserProfile
-      div.profile-card
+      div#profile-update
         a(href="/modifier-mon-mot-de-passe") Modifier mon mot de passe
         a(href="/modifier-mes-coordonnees") Modifier mes coordonnées
     else
@@ -23,12 +21,11 @@ block main
             option(value="4") 4
             option(value="5") 5
           button(type="submit") Valider
-    ul
-      - var score = user.getAverageScore()
-      li Note moyenne : #{score ? score : "Pas encore de note"}
-      li Membre depuis le #{user.added_at}
-
-    div.coordinates
+    - var score = user.getAverageScore()
+    div#average-score
+      h3 Note moyenne
+      div #{score ? score : "Pas encore de note"}
+    div#coordinates
       table
         thead
           tr

@@ -23,8 +23,3 @@ block main
       button(type="submit") S'inscrire
 
     p Déjà un compte ? #[a(href="/connexion") Se connecter.]
-
-    if flashErrors
-      ul
-        each error in flashErrors
-          li= error 

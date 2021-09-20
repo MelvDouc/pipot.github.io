@@ -25,8 +25,3 @@ block main
       input(type="text" id="phone_number" name="phone_number" maxlength="20" value= user.phone_number)
     div.form-submit
       button(type="submit") Mettre à jour
-
-  if flashErrors
-    ul
-      each error in flashErrors
-       li= error

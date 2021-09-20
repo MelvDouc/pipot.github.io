@@ -12,6 +12,12 @@ html(lang="fr")
     header
       include ./_inc/header.pug
     main
+      if flashSuccess
+        p.flash-success= flashSuccess
+      if flashErrors
+        ul
+          each error in flashErrors
+            li.flash-error= error
       block main
     footer
       section.top

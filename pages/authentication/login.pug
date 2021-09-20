@@ -11,11 +11,6 @@ block main
     div.form-submit
       button(type="submit") Se connecter
 
-    p.
-      Pas encore de compte ? #[a(href="/inscription") S'inscrire.]
-
-    if flashErrors
-      ul
-        each error in flashErrors
-          li= error
+    p Pas encore de compte ?&nbsp;
+      a(href="/inscription") S'inscrire.
       

@@ -4,12 +4,6 @@ block main
   h2= title
   include ../_inc/user-nav.pug
   div.content
-    if flashSuccess
-      p.flash= flashSuccess
-    if flashErrors
-      ul
-        each error in flashErrors
-         li= error
     if !user.getBasket()
       p Votre panier est vide. Vous pouvez jeter un oeil à la #[a(href="/categories") page des catégories] et ajouter les articles qui vous intéressent.
     else
